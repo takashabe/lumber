@@ -1,0 +1,10 @@
+table: entries
+record:
+  - id: 1
+    title: foo
+    content: bar
+    status: 1
+  - id: 2
+    title: foo
+    content: bar
+    status: 1
