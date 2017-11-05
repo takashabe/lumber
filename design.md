@@ -3,6 +3,8 @@
 ## Concept
 
 * Contents management can be at git repository
+* To add an entry, you just need to add a Markdown file
+    * In real world, push markdown files to lumber server
 * Site generator?
     * Unnecessary
     * Implement converter from markdown to html
