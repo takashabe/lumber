@@ -14,6 +14,18 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/russross/blackfriday"
+  packages = ["."]
+  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
+  version = "v2.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shurcooL/sanitized_anchor_name"
+  packages = ["."]
+  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+
+[[projects]]
   branch = "master"
   name = "github.com/takashabe/go-fixture"
   packages = [".","mysql"]
@@ -28,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "58fcca2b8f1c594de28fcaa319fbb2f301ac26eff00678d907c2f1d861533efc"
+  inputs-digest = "10dabc7c96065724ec2de118dc80b571c9c83ef25b84d7839a6edc5602898ae9"
   solver-name = "gps-cdcl"
   solver-version = 1
