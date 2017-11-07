@@ -62,3 +62,26 @@ func TestNewEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestPost(t *testing.T) {
+	cases := []struct {
+		inputFilePath string
+	}{
+		{"testdata/go-pubsub_readme.md"},
+		{"testdata/minimum.md"},
+	}
+	for i, c := range cases {
+		data, err := ioutil.ReadFile(c.inputFilePath)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		entry, err := NewEntry(data, EntryStatusPublic)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		err = entry.Post()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+	}
+}
