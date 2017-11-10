@@ -51,13 +51,13 @@ func TestNewEntry(t *testing.T) {
 			continue
 		}
 
-		if entry.title != c.expectTitle {
-			t.Fatalf("#%d: want title %s, got %s", i, c.expectTitle, entry.title)
+		if entry.Title != c.expectTitle {
+			t.Fatalf("#%d: want title %s, got %s", i, c.expectTitle, entry.Title)
 		}
-		if !strings.HasPrefix(entry.content, c.expectContentHead) {
+		if !strings.HasPrefix(entry.Content, c.expectContentHead) {
 			t.Fatalf("#%d: want content prefix %s", i, c.expectContentHead)
 		}
-		if !strings.HasSuffix(entry.content, c.expectContentTail) {
+		if !strings.HasSuffix(entry.Content, c.expectContentTail) {
 			t.Fatalf("#%d: want content suffix %s", i, c.expectContentTail)
 		}
 	}

@@ -2,6 +2,7 @@ package model
 
 import (
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/russross/blackfriday"
@@ -11,9 +12,12 @@ import (
 
 // Entry provides operation for entries
 type Entry struct {
-	title   string
-	content string
-	status  EntryStatus
+	ID        int
+	Title     string
+	Content   string
+	Status    EntryStatus
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // EntryStatus represent status of the entries
@@ -51,9 +55,9 @@ func NewEntry(data []byte, status EntryStatus) (*Entry, error) {
 		return nil, config.ErrEmptyEntry
 	}
 	return &Entry{
-		title:   title,
-		content: content,
-		status:  status,
+		Title:   title,
+		Content: content,
+		Status:  status,
 	}, nil
 }
 
@@ -93,5 +97,5 @@ func (e *Entry) Post() error {
 	}
 	defer db.Close()
 
-	return db.SaveEntry(e.title, e.content, int(e.status))
+	return db.SaveEntry(e.Title, e.Content, int(e.Status))
 }
