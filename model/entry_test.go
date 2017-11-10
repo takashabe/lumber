@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -59,6 +60,32 @@ func TestNewEntry(t *testing.T) {
 		}
 		if !strings.HasSuffix(entry.Content, c.expectContentTail) {
 			t.Fatalf("#%d: want content suffix %s", i, c.expectContentTail)
+		}
+	}
+}
+
+func TestGetEntry(t *testing.T) {
+	cases := []struct {
+		input     int
+		expectID  int
+		expectErr error
+	}{
+		{1, 1, nil},
+		{0, 0, sql.ErrNoRows},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+
+		act, err := GetEntry(c.input)
+		if err != c.expectErr {
+			t.Fatalf("#%d: want error %v, got %v", i, c.expectErr, err)
+		}
+		if err != nil {
+			continue
+		}
+
+		if act.ID != c.expectID {
+			t.Fatalf("#%d: want %d, got %d", i, c.expectID, act.ID)
 		}
 	}
 }

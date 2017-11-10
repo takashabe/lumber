@@ -89,6 +89,29 @@ func trimHTMLTag(s string) string {
 	return s[openIdx+1 : closeIdx]
 }
 
+// GetEntry returns entry when matched id
+func GetEntry(id int) (*Entry, error) {
+	db, err := datastore.NewDatastore()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	raw, err := db.FindEntryByID(id)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: consideration struct fields
+	return &Entry{
+		ID:        raw.ID,
+		Title:     raw.Title,
+		Content:   raw.Content,
+		Status:    EntryStatus(raw.Status),
+		CreatedAt: raw.CreatedAt,
+		UpdatedAt: raw.UpdatedAt,
+	}, nil
+}
+
 // Post saves the posted data in the background datastore
 func (e *Entry) Post() error {
 	db, err := datastore.NewDatastore()
