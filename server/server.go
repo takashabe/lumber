@@ -85,7 +85,7 @@ type Server struct {
 }
 
 // NewServer returns initialized Server
-func NewServer(pubsubAddr string) (*Server, error) {
+func NewServer() (*Server, error) {
 	session, err := session.NewManager("memory", "portal", 3600)
 	if err != nil {
 		return nil, err
