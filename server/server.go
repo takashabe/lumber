@@ -99,10 +99,11 @@ func NewServer() (*Server, error) {
 func (s *Server) Routes() *router.Router {
 	r := router.NewRouter()
 
-	// TODO: implements URLs
-	r.Get("/api/", func(w http.ResponseWriter, req *http.Request) {
-		Respond(w, http.StatusNotFound, "not found")
-	})
+	// For entries
+	r.Post("/api/entry/", nil)
+	r.Get("/api/entry/:id", nil)
+	r.Put("/api/entry/:id", nil)
+	r.Delete("/api/entry/:id", nil)
 
 	return r
 }
