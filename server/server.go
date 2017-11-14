@@ -110,6 +110,6 @@ func (s *Server) Routes() *router.Router {
 
 // Run start server
 func (s *Server) Run(port int) error {
-	log.Printf("Portal server running at http://localhost:%d/", port)
+	log.Printf("Lumber server running at http://localhost:%d/", port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), s.Routes())
 }
