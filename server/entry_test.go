@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,6 +31,18 @@ func setupServer(t *testing.T) *httptest.Server {
 	return httptest.NewServer(s.Routes())
 }
 
+func sendRequest(t *testing.T, method, url string, body io.Reader) *http.Response {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+	return res
+}
+
 func TestGetEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()
@@ -43,7 +56,14 @@ func TestGetEntry(t *testing.T) {
 	}
 	for i, c := range cases {
 		loadFixture(t, "fixture/entries.yml")
-		res, err := http.Get(ts.URL + fmt.Sprintf("/api/entry/%d", c.input))
+		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
+		defer res.Body.Close()
+
+		if res.StatusCode != c.expect {
+			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		}
+	}
+}
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
