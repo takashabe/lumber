@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -64,9 +66,42 @@ func TestGetEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestPostEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	type postPayload struct {
+		Data   []byte `json:"data"`
+		Status int    `json:"status"`
+	}
+	cases := []struct {
+		input  postPayload
+		expect int
+	}{
+		{
+			postPayload{
+				Data:   []byte("# title\n\n## content"),
+				Status: 1,
+			},
+			http.StatusOK,
+		},
+		{
+			postPayload{
+				Data:   []byte("# title\n\n## content"),
+				Status: 99,
+			},
+			http.StatusNotFound,
+		},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+		var buf bytes.Buffer
+		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
+		res := sendRequest(t, "POST", fmt.Sprintf("%s/api/entry/", ts.URL), &buf)
 		defer res.Body.Close()
 
 		if res.StatusCode != c.expect {
