@@ -20,8 +20,8 @@ func (s *Server) GetEntry(w http.ResponseWriter, r *http.Request, id int) {
 // PostEntry create new entry
 func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 	raw := struct {
-		data   []byte
-		status int
+		Data   []byte `json:"data"`
+		Status int    `json:"status"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&raw)
 	if err != nil {
@@ -29,15 +29,15 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entry, err := model.NewEntry(raw.data, model.EntryStatus(raw.status))
+	entry, err := model.NewEntry(raw.Data, model.EntryStatus(raw.Status))
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}
 	response := struct {
-		id int
+		ID int `json:"id"`
 	}{
-		id: entry.ID,
+		ID: entry.ID,
 	}
 	JSON(w, http.StatusOK, response)
 }
