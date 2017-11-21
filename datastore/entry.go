@@ -53,3 +53,16 @@ func (d *Datastore) SaveEntry(title, content string, status int) error {
 	_, err = stmt.Exec(title, content, status)
 	return err
 }
+
+// DeleteEntry deletes entry with returns whether deleted columns and error
+func (d *Datastore) DeleteEntry(id int) (bool, error) {
+	stmt, err := d.Conn.Prepare("delete from entries where id=?")
+	if err != nil {
+		return false, err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(id)
+	cnt, _ := res.RowsAffected()
+	return cnt > 0, err
+}
