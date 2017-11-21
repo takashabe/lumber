@@ -63,14 +63,14 @@ func TestSaveEntry(t *testing.T) {
 		expectErr    error
 	}{
 		{
-			randomStringWithBytes(1 << 8),
-			randomStringWithBytes(1<<16 - 1),
+			stringWithBytes(1 << 8),
+			stringWithBytes(1<<16 - 1),
 			0,
 			nil,
 		},
 		{
-			randomStringWithBytes(1 << 8),
-			randomStringWithBytes(1 << 16),
+			stringWithBytes(1 << 8),
+			stringWithBytes(1 << 16),
 			0,
 			config.ErrEntrySizeLimitExceeded,
 		},
