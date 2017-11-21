@@ -88,3 +88,32 @@ func TestSaveEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteEntry(t *testing.T) {
+	db, err := NewDatastore()
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+
+	cases := []struct {
+		input  int
+		expect bool
+	}{
+		{1, true},
+		{0, false},
+	}
+	for i, c := range cases {
+		f := fixture.NewFixture(db.Conn, "mysql")
+		err = f.Load("fixture/entries.yml")
+		if err != nil {
+			t.Fatalf("want non error, got %v", err)
+		}
+		flag, err := db.DeleteEntry(c.input)
+		if err != nil {
+			t.Fatalf("want non error, got %v", err)
+		}
+		if flag != c.expect {
+			t.Errorf("#%d: want error %v, got %v", i, c.expect, err)
+		}
+	}
+}
