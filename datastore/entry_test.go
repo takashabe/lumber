@@ -46,7 +46,7 @@ func TestSaveEntry(t *testing.T) {
 		t.Fatalf("want non error, got %v", err)
 	}
 
-	randomStringWithBytes := func(size int) string {
+	stringWithBytes := func(size int) string {
 		buf := bytes.NewBuffer(make([]byte, 0, size))
 		for i := 0; i < size; i++ {
 			if err := buf.WriteByte('a'); err != nil {
