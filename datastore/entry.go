@@ -54,6 +54,18 @@ func (d *Datastore) SaveEntry(title, content string, status int) error {
 	return err
 }
 
+// EditEntry changes the title and content of the entry
+func (d *Datastore) EditEntry(id int, title, content string) error {
+	stmt, err := d.Conn.Prepare("update entries set title=?, content=? where id=?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(title, content, id)
+	return err
+}
+
 // DeleteEntry delets record when matched id, and returns number of deleted record and an error
 func (d *Datastore) DeleteEntry(id int) (bool, error) {
 	stmt, err := d.Conn.Prepare("delete from entries where id=?")

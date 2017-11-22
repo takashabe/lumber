@@ -89,6 +89,44 @@ func TestSaveEntry(t *testing.T) {
 	}
 }
 
+func TestEditEntry(t *testing.T) {
+	db, err := NewDatastore()
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+
+	cases := []struct {
+		inputID      int
+		inputTitle   string
+		inputContent string
+	}{
+		{
+			1,
+			"edit_title",
+			"edit_content",
+		},
+	}
+	for i, c := range cases {
+		f := fixture.NewFixture(db.Conn, "mysql")
+		err = f.Load("fixture/entries.yml")
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		err = db.EditEntry(c.inputID, c.inputTitle, c.inputContent)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		e, err := db.FindEntryByID(c.inputID)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		if e.Title != c.inputTitle || e.Content != c.inputContent {
+			t.Errorf("#%d: want title %s and content %s, but title %s and content %s",
+				i, e.Title, e.Content, c.inputTitle, c.inputContent)
+		}
+	}
+}
+
 func TestDeleteEntry(t *testing.T) {
 	db, err := NewDatastore()
 	if err != nil {
