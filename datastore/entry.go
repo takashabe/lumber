@@ -54,7 +54,7 @@ func (d *Datastore) SaveEntry(title, content string, status int) error {
 	return err
 }
 
-// DeleteEntry deletes entry with returns whether deleted columns and error
+// DeleteEntry delets record when matched id, and returns number of deleted record and an error
 func (d *Datastore) DeleteEntry(id int) (bool, error) {
 	stmt, err := d.Conn.Prepare("delete from entries where id=?")
 	if err != nil {
