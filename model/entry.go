@@ -122,3 +122,14 @@ func (e *Entry) Post() error {
 
 	return db.SaveEntry(e.Title, e.Content, int(e.Status))
 }
+
+// Edit changes entry the title and content
+func (e *Entry) Edit() error {
+	db, err := datastore.NewDatastore()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	return db.EditEntry(e.Title, e.Content)
+}

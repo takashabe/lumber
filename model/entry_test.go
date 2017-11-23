@@ -112,3 +112,23 @@ func TestPost(t *testing.T) {
 		}
 	}
 }
+
+func TestEdit(t *testing.T) {
+	cases := []struct {
+		input []byte
+	}{
+		{[]byte("# title\n\n## content")},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+
+		entry, err := NewEntry(c.input, EntryStatusPublic)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		err = entry.Edit()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+	}
+}
