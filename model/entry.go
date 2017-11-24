@@ -45,11 +45,7 @@ func (es EntryStatus) isValid() bool {
 }
 
 // NewEntry returns initialized Entry object
-func NewEntry(data []byte, status EntryStatus) (*Entry, error) {
-	if !status.isValid() {
-		return nil, errors.Errorf("invalid entry status type: %d", status)
-	}
-
+func NewEntry(data []byte) (*Entry, error) {
 	title, content := extractTitleAndContent(data)
 	if len(title) == 0 || len(content) == 0 {
 		return nil, config.ErrEmptyEntry
@@ -57,7 +53,6 @@ func NewEntry(data []byte, status EntryStatus) (*Entry, error) {
 	return &Entry{
 		Title:   title,
 		Content: content,
-		Status:  status,
 	}, nil
 }
 
@@ -113,14 +108,18 @@ func GetEntry(id int) (*Entry, error) {
 }
 
 // Post saves the posted data in the background datastore
-func (e *Entry) Post() error {
+func (e *Entry) Post(s EntryStatus) error {
+	if !s.isValid() {
+		return errors.Errorf("invalid entry status type: %d", s)
+	}
+
 	db, err := datastore.NewDatastore()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	return db.SaveEntry(e.Title, e.Content, int(e.Status))
+	return db.SaveEntry(e.Title, e.Content, int(s))
 }
 
 // Edit changes entry the title and content

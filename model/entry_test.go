@@ -44,7 +44,7 @@ func TestNewEntry(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
-		entry, err := NewEntry(data, EntryStatusPublic)
+		entry, err := NewEntry(data)
 		if err != c.expectErr {
 			t.Fatalf("#%d: want error %v, got %v", i, c.expectErr, err)
 		}
@@ -102,11 +102,11 @@ func TestPost(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
-		entry, err := NewEntry(data, EntryStatusPublic)
+		entry, err := NewEntry(data)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
-		err = entry.Post()
+		err = entry.Post(EntryStatusPublic)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
@@ -125,7 +125,7 @@ func TestEdit(t *testing.T) {
 	for i, c := range cases {
 		loadFixture(t, "fixture/entries.yml")
 
-		entry, err := NewEntry(c.inputData, EntryStatusPublic)
+		entry, err := NewEntry(c.inputData)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
