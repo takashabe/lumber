@@ -131,5 +131,5 @@ func (e *Entry) Edit() error {
 	}
 	defer db.Close()
 
-	return db.EditEntry(e.Title, e.Content)
+	return db.EditEntry(e.ID, e.Title, e.Content)
 }

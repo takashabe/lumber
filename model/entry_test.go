@@ -115,20 +115,37 @@ func TestPost(t *testing.T) {
 
 func TestEdit(t *testing.T) {
 	cases := []struct {
-		input []byte
+		inputID      int
+		inputData    []byte
+		expectGetErr error
 	}{
-		{[]byte("# title\n\n## content")},
+		{1, []byte("# title\n\n## content"), nil},
+		{0, []byte("# title\n\n## content"), sql.ErrNoRows},
 	}
 	for i, c := range cases {
 		loadFixture(t, "fixture/entries.yml")
 
-		entry, err := NewEntry(c.input, EntryStatusPublic)
+		entry, err := NewEntry(c.inputData, EntryStatusPublic)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
+		entry.ID = c.inputID
 		err = entry.Edit()
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+
+		editedEntry, err := GetEntry(c.inputID)
+		if err != c.expectGetErr {
+			t.Fatalf("#%d: want error %v, got %v", i, c.expectGetErr, err)
+		}
+		if err != nil {
+			continue
+		}
+
+		if editedEntry.Title != entry.Title || editedEntry.Content != entry.Content {
+			t.Fatalf("#%d: want title %s and content %s, got title %s and content %s",
+				i, editedEntry.Title, editedEntry.Content, entry.Title, entry.Content)
 		}
 	}
 }
