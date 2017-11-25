@@ -30,7 +30,12 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entry, err := model.NewEntry(raw.Data, model.EntryStatus(raw.Status))
+	entry, err := model.NewEntry(raw.Data)
+	if err != nil {
+		Error(w, http.StatusNotFound, err, "failed to create new entry")
+		return
+	}
+	err = entry.Post(model.EntryStatus(raw.Status))
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
