@@ -157,3 +157,25 @@ func TestEditEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	cases := []struct {
+		input  int
+		expect int
+	}{
+		{1, http.StatusOK},
+		{0, http.StatusNotFound},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+		res := sendRequest(t, "DELETE", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
+		defer res.Body.Close()
+
+		if res.StatusCode != c.expect {
+			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		}
+	}
+}

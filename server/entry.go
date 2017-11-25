@@ -78,3 +78,18 @@ func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	JSON(w, http.StatusOK, nil)
 }
+
+// DeleteEntry deletes entry
+func (s *Server) DeleteEntry(w http.ResponseWriter, r *http.Request, id int) {
+	entry, err := model.GetEntry(id)
+	if err != nil {
+		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
+		return
+	}
+	err = entry.Delete()
+	if err != nil {
+		Error(w, http.StatusNotFound, err, "failed to delete entry")
+		return
+	}
+	JSON(w, http.StatusOK, nil)
+}
