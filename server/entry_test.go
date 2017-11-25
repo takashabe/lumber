@@ -109,3 +109,51 @@ func TestPostEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestEditEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	type editPayload struct {
+		Data []byte `json:"data"`
+	}
+	cases := []struct {
+		inputID      int
+		inputPayload editPayload
+		expect       int
+	}{
+		{
+			1,
+			editPayload{
+				Data: []byte("# title\n\n## content"),
+			},
+			http.StatusOK,
+		},
+		{
+			1,
+			editPayload{},
+			http.StatusNotFound,
+		},
+		{
+			0,
+			editPayload{
+				Data: []byte("# title\n\n## content"),
+			},
+			http.StatusNotFound,
+		},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+		var buf bytes.Buffer
+		err := json.NewEncoder(&buf).Encode(c.inputPayload)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		res := sendRequest(t, "PUT", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.inputID), &buf)
+		defer res.Body.Close()
+
+		if res.StatusCode != c.expect {
+			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		}
+	}
+}
