@@ -8,8 +8,6 @@ import (
 	"os"
 
 	"github.com/takashabe/go-router"
-	session "github.com/takashabe/go-session"
-	_ "github.com/takashabe/go-session/memory" // session driver
 )
 
 // printDebugf behaves like log.Printf only in the debug env
@@ -78,21 +76,14 @@ func JSON(w http.ResponseWriter, code int, src interface{}) {
 	Respond(w, code, src)
 }
 
-// Server supply HTTP server of the portal
+// Server supply HTTP server
 type Server struct {
-	port    int
-	session *session.Manager
+	port int
 }
 
 // NewServer returns initialized Server
 func NewServer() (*Server, error) {
-	session, err := session.NewManager("memory", "portal", 3600)
-	if err != nil {
-		return nil, err
-	}
-	return &Server{
-		session: session,
-	}, nil
+	return &Server{}, nil
 }
 
 // Routes returns router
