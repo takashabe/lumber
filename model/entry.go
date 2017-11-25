@@ -132,3 +132,15 @@ func (e *Entry) Edit() error {
 
 	return db.EditEntry(e.ID, e.Title, e.Content)
 }
+
+// Delete deletes entry
+func (e *Entry) Delete() error {
+	db, err := datastore.NewDatastore()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.DeleteEntry(e.ID)
+	return err
+}

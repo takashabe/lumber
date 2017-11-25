@@ -149,3 +149,27 @@ func TestEdit(t *testing.T) {
 		}
 	}
 }
+
+func TestDelete(t *testing.T) {
+	cases := []struct {
+		input int
+	}{
+		{1},
+		{0},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+
+		entry := &Entry{
+			ID: c.input,
+		}
+		err := entry.Delete()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		_, err = GetEntry(c.input)
+		if err != sql.ErrNoRows {
+			t.Fatalf("#%d: want error sql.ErrNoRows, got %v", i, err)
+		}
+	}
+}
