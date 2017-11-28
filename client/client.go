@@ -26,7 +26,7 @@ func New() (*Client, error) {
 	if len(addr) == 0 {
 		return nil, errors.New("Require settings server address in environment variable")
 	}
-	if addr[len(addr)-1] != "/" {
+	if addr[len(addr)-1] != '/' {
 		addr = addr + "/"
 	}
 	if _, err := url.Parse(addr); err != nil {
@@ -36,7 +36,7 @@ func New() (*Client, error) {
 	return &Client{
 		addr:  addr,
 		token: os.Getenv(LumberSessionToken),
-	}
+	}, nil
 }
 
 // CreateEntry submit markdown file as a new entry
