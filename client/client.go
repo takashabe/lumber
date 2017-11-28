@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"net/url"
 	"os"
 
@@ -35,5 +36,18 @@ func New() (*Client, error) {
 	return &Client{
 		addr:  addr,
 		token: os.Getenv(LumberSessionToken),
+	}
+}
+
+// CreateEntry submit markdown file as a new entry
+func (c *Client) CreateEntry(ctx context.Context, file string) (int, error) {
+	return 0, nil
+}
+
+// Entry returns initialized Entry
+func (c *Client) Entry() *Entry {
+	return &Entry{
+		addr:  c.addr,
+		token: c.token,
 	}
 }
