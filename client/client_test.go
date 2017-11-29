@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	fixture "github.com/takashabe/go-fixture"
+	"github.com/takashabe/lumber/datastore"
 	"github.com/takashabe/lumber/server"
 )
 
@@ -17,6 +19,18 @@ func setupServer(t *testing.T) *httptest.Server {
 	ts := httptest.NewServer(s.Routes())
 	os.Setenv(LumberServerAddress, ts.URL)
 	return ts
+}
+
+func loadFixture(t *testing.T, file string) {
+	db, err := datastore.NewDatastore()
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+	f := fixture.NewFixture(db.Conn, "mysql")
+	err = f.Load(file)
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
 }
 
 func TestCreateAndGetEntry(t *testing.T) {
@@ -50,6 +64,52 @@ func TestCreateAndGetEntry(t *testing.T) {
 		}
 		if entry.ID != id {
 			t.Errorf("#%d: want id %d, got %d", i, id, entry.ID)
+		}
+		if entry.Title != c.expectTitle || entry.Content != c.expectContent {
+			t.Errorf("#%d: want title %s and content %s, got %s and %s",
+				i, c.expectTitle, c.expectContent, entry.Title, entry.Content)
+		}
+	}
+}
+
+func TestEditEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	cases := []struct {
+		inputID       int
+		inputFile     string
+		expectTitle   string
+		expectContent string
+	}{
+		{
+			1,
+			"testdata/minimum.md",
+			"title",
+			"<p>content</p>",
+		},
+		{
+			1,
+			"testdata/minimum2.md",
+			"title",
+			"<h2>content</h2>\n\n<ul>\n<li>list</li>\n<li>list2</li>\n</ul>",
+		},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+		ctx := context.Background()
+		client, err := New()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		entryClient := client.Entry(c.inputID)
+		err = entryClient.Edit(ctx, c.inputFile)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		entry, err := entryClient.Get(ctx)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
 		if entry.Title != c.expectTitle || entry.Content != c.expectContent {
 			t.Errorf("#%d: want title %s and content %s, got %s and %s",
