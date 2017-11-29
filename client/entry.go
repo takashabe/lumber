@@ -81,5 +81,14 @@ func (e *Entry) Edit(ctx context.Context, file string) error {
 
 // Delete submit makrdown file as an entry
 func (e *Entry) Delete(ctx context.Context) error {
-	return nil
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%sapi/entry/%d", e.addr, e.id), nil)
+	if err != nil {
+		return err
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	return verifyHTTPStatusCode(http.StatusOK, res)
 }

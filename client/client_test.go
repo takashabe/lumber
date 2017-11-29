@@ -117,3 +117,28 @@ func TestEditEntry(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	cases := []struct {
+		input int
+	}{
+		{
+			1,
+		},
+	}
+	for i, c := range cases {
+		loadFixture(t, "fixture/entries.yml")
+		ctx := context.Background()
+		client, err := New()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		err = client.Entry(c.input).Delete(ctx)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+	}
+}
