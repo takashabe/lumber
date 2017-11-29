@@ -82,7 +82,7 @@ func TestSaveEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		err := db.SaveEntry(c.inputTitle, c.inputContent, c.inputStatus)
+		_, err := db.SaveEntry(c.inputTitle, c.inputContent, c.inputStatus)
 		if err != c.expectErr {
 			t.Errorf("#%d: want error %v, got %v", i, c.expectErr, err)
 		}

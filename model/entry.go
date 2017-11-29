@@ -108,14 +108,14 @@ func GetEntry(id int) (*Entry, error) {
 }
 
 // Post saves the posted data in the background datastore
-func (e *Entry) Post(s EntryStatus) error {
+func (e *Entry) Post(s EntryStatus) (int, error) {
 	if !s.isValid() {
-		return errors.Errorf("invalid entry status type: %d", s)
+		return 0, errors.Errorf("invalid entry status type: %d", s)
 	}
 
 	db, err := datastore.NewDatastore()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.Close()
 

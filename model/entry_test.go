@@ -106,7 +106,7 @@ func TestPost(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}
-		err = entry.Post(EntryStatusPublic)
+		_, err = entry.Post(EntryStatusPublic)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
 		}

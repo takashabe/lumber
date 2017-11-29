@@ -35,7 +35,7 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}
-	err = entry.Post(model.EntryStatus(raw.Status))
+	id, err := entry.Post(model.EntryStatus(raw.Status))
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
@@ -43,7 +43,7 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 	response := struct {
 		ID int `json:"id"`
 	}{
-		ID: entry.ID,
+		ID: id,
 	}
 	JSON(w, http.StatusOK, response)
 }

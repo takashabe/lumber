@@ -34,24 +34,28 @@ func (d *Datastore) FindEntryByID(id int) (*EntriesModel, error) {
 }
 
 // SaveEntry saves entry data to datastore
-func (d *Datastore) SaveEntry(title, content string, status int) error {
+func (d *Datastore) SaveEntry(title, content string, status int) (int, error) {
 	sizeTitle := len(title)
 	sizeContent := len(content)
 	if sizeTitle == 0 || sizeContent == 0 {
-		return config.ErrEmptyEntry
+		return 0, config.ErrEmptyEntry
 	}
 	if sizeTitle > config.MaxTitleBytes || sizeContent > config.MaxContentBytes {
-		return config.ErrEntrySizeLimitExceeded
+		return 0, config.ErrEntrySizeLimitExceeded
 	}
 
 	stmt, err := d.Conn.Prepare("insert into entries (title, content, status) values(?, ?, ?)")
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(title, content, status)
-	return err
+	res, err := stmt.Exec(title, content, status)
+	if err != nil {
+		return 0, err
+	}
+	id, _ := res.LastInsertId()
+	return int(id), nil
 }
 
 // EditEntry changes the title and content of the entry
