@@ -1,20 +1,24 @@
 package helper
 
 import (
+	"database/sql"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/takashabe/go-fixture"
 	_ "github.com/takashabe/go-fixture/mysql" // driver
-	"github.com/takashabe/lumber/datastore"
 )
 
 // LoadFixture load fixture files
 func LoadFixture(t *testing.T, file string) {
-	db, err := datastore.NewDatastore()
+	db, err := newDatastore()
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}
-	f := fixture.NewFixture(db.Conn, "mysql")
+	defer db.Close()
+
+	f := fixture.NewFixture(db, "mysql")
 	err = f.Load(file)
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
@@ -23,14 +27,44 @@ func LoadFixture(t *testing.T, file string) {
 
 // SetupTables initialize the database by fixture of the schema
 func SetupTables() {
-	db, err := datastore.NewDatastore()
+	db, err := newDatastore()
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
-	f := fixture.NewFixture(db.Conn, "mysql")
+	f := fixture.NewFixture(db, "mysql")
 	err = f.LoadSQL("../_sql/schema.sql")
 	if err != nil {
 		panic(err)
 	}
+}
+
+// newDatastore returns sql.DB
+// Porting from datastore package
+func newDatastore() (*sql.DB, error) {
+	getEnvWithDefault := func(name, def string) string {
+		if env := os.Getenv(name); len(env) != 0 {
+			return env
+		}
+		return def
+	}
+
+	user := getEnvWithDefault("DB_USER", "root")
+	password := getEnvWithDefault("DB_PASSWORD", "")
+	host := getEnvWithDefault("DB_HOST", "localhost")
+	port := getEnvWithDefault("DB_PORT", "3306")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/lumber?parseTime=true", user, password, host, port)
+
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	db.SetMaxIdleConns(32)
+	db.SetMaxOpenConns(32)
+
+	return db, nil
 }
