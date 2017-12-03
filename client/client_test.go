@@ -6,8 +6,7 @@ import (
 	"os"
 	"testing"
 
-	fixture "github.com/takashabe/go-fixture"
-	"github.com/takashabe/lumber/datastore"
+	"github.com/takashabe/lumber/helper"
 	"github.com/takashabe/lumber/server"
 )
 
@@ -19,18 +18,6 @@ func setupServer(t *testing.T) *httptest.Server {
 	ts := httptest.NewServer(s.Routes())
 	os.Setenv(LumberServerAddress, ts.URL)
 	return ts
-}
-
-func loadFixture(t *testing.T, file string) {
-	db, err := datastore.NewDatastore()
-	if err != nil {
-		t.Fatalf("want non error, got %v", err)
-	}
-	f := fixture.NewFixture(db.Conn, "mysql")
-	err = f.Load(file)
-	if err != nil {
-		t.Fatalf("want non error, got %v", err)
-	}
 }
 
 func TestCreateAndGetEntry(t *testing.T) {
@@ -96,7 +83,7 @@ func TestEditEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		ctx := context.Background()
 		client, err := New()
 		if err != nil {
@@ -130,7 +117,7 @@ func TestDeleteEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		ctx := context.Background()
 		client, err := New()
 		if err != nil {

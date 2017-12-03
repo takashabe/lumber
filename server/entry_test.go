@@ -9,21 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/takashabe/go-fixture"
-	"github.com/takashabe/lumber/datastore"
+	"github.com/takashabe/lumber/helper"
 )
-
-func loadFixture(t *testing.T, file string) {
-	db, err := datastore.NewDatastore()
-	if err != nil {
-		t.Fatalf("want non error, got %v", err)
-	}
-	f := fixture.NewFixture(db.Conn, "mysql")
-	err = f.Load(file)
-	if err != nil {
-		t.Fatalf("want non error, got %v", err)
-	}
-}
 
 func setupServer(t *testing.T) *httptest.Server {
 	s, err := NewServer()
@@ -57,7 +44,7 @@ func TestGetEntry(t *testing.T) {
 		{0, http.StatusNotFound},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
 		defer res.Body.Close()
 
@@ -95,7 +82,7 @@ func TestPostEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {
@@ -143,7 +130,7 @@ func TestEditEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.inputPayload)
 		if err != nil {
@@ -170,7 +157,7 @@ func TestDeleteEntry(t *testing.T) {
 		{0, http.StatusNotFound},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 		res := sendRequest(t, "DELETE", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
 		defer res.Body.Close()
 

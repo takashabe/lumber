@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/takashabe/go-fixture"
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/helper"
 )
 
 func TestFindEntryByID(t *testing.T) {
@@ -14,11 +14,8 @@ func TestFindEntryByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}
-	f := fixture.NewFixture(db.Conn, "mysql")
-	err = f.Load("fixture/entries.yml")
-	if err != nil {
-		t.Fatalf("want non error, got %v", err)
-	}
+	defer db.Close()
+	helper.LoadFixture(t, "fixture/entries.yml")
 
 	cases := []struct {
 		input     int
@@ -107,11 +104,8 @@ func TestEditEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		f := fixture.NewFixture(db.Conn, "mysql")
-		err = f.Load("fixture/entries.yml")
-		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
-		}
+		helper.LoadFixture(t, "fixture/entries.yml")
+
 		err = db.EditEntry(c.inputID, c.inputTitle, c.inputContent)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %v", i, err)
@@ -141,11 +135,8 @@ func TestDeleteEntry(t *testing.T) {
 		{0, false},
 	}
 	for i, c := range cases {
-		f := fixture.NewFixture(db.Conn, "mysql")
-		err = f.Load("fixture/entries.yml")
-		if err != nil {
-			t.Fatalf("want non error, got %v", err)
-		}
+		helper.LoadFixture(t, "fixture/entries.yml")
+
 		flag, err := db.DeleteEntry(c.input)
 		if err != nil {
 			t.Fatalf("want non error, got %v", err)

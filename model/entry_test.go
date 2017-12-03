@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/helper"
 )
 
 func TestNewEntry(t *testing.T) {
@@ -74,7 +75,7 @@ func TestGetEntry(t *testing.T) {
 		{0, 0, sql.ErrNoRows},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 
 		act, err := GetEntry(c.input)
 		if err != c.expectErr {
@@ -123,7 +124,7 @@ func TestEdit(t *testing.T) {
 		{0, []byte("# title\n\n## content"), sql.ErrNoRows},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 
 		entry, err := NewEntry(c.inputData)
 		if err != nil {
@@ -158,7 +159,7 @@ func TestDelete(t *testing.T) {
 		{0},
 	}
 	for i, c := range cases {
-		loadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "fixture/entries.yml")
 
 		entry := &Entry{
 			ID: c.input,
