@@ -42,6 +42,7 @@ func TestSaveEntry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}
+	defer db.Close()
 
 	stringWithBytes := func(size int) string {
 		buf := bytes.NewBuffer(make([]byte, 0, size))
@@ -91,6 +92,7 @@ func TestEditEntry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}
+	defer db.Close()
 
 	cases := []struct {
 		inputID      int
@@ -126,6 +128,7 @@ func TestDeleteEntry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}
+	defer db.Close()
 
 	cases := []struct {
 		input  int
