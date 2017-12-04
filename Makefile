@@ -6,6 +6,9 @@ deps:
 	dep ensure
 
 test:
+	go test -v -p 1 $(SUBPACKAGES)
+
+test-mock:
 	go test -v $(SUBPACKAGES)
 
 vet:
