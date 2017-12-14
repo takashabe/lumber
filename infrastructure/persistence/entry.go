@@ -2,41 +2,35 @@ package persistence
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/domain"
 )
 
-// EntriesModel represent entries table
-type EntriesModel struct {
-	ID        int
-	Title     string
-	Content   string
-	Status    int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+// EntryRepositoryImpl implements the EntryRepository
+type EntryRepositoryImpl struct {
+	*SQLRepositoryAdapter
 }
 
-func (m *EntriesModel) mapRow(r *sql.Row) error {
-	return r.Scan(&m.ID, &m.Title, &m.Content, &m.Status, &m.CreatedAt, &m.UpdatedAt)
+func (r *EntryRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Entry, error) {
+	m := &domain.Entry{}
+	err := row.Scan(&m.ID, &m.Title, &m.Content, &m.Status, &m.CreatedAt, &m.UpdatedAt)
+	return m, err
 }
 
-// FindEntryByID return a entires record matched by 'id'
-func (d *Datastore) FindEntryByID(id int) (*EntriesModel, error) {
-	row, err := d.queryRow("select * from entries where id=?", id)
+// Get return a entry record matched by 'id'
+func (r *EntryRepositoryImpl) Get(id int) (*domain.Entry, error) {
+	row, err := r.queryRow("select * from entries where id=?", id)
 	if err != nil {
 		return nil, err
 	}
-
-	model := &EntriesModel{}
-	err = model.mapRow(row)
-	return model, err
+	return r.mapToEntity(row)
 }
 
-// SaveEntry saves entry data to datastore
-func (d *Datastore) SaveEntry(title, content string, status int) (int, error) {
-	sizeTitle := len(title)
-	sizeContent := len(content)
+// Save saves entry data to datastore
+func (r *EntryRepositoryImpl) Save(e *domain.Entry) (int, error) {
+	sizeTitle := len(e.Title)
+	sizeContent := len(e.Content)
 	if sizeTitle == 0 || sizeContent == 0 {
 		return 0, config.ErrEmptyEntry
 	}
@@ -44,13 +38,13 @@ func (d *Datastore) SaveEntry(title, content string, status int) (int, error) {
 		return 0, config.ErrEntrySizeLimitExceeded
 	}
 
-	stmt, err := d.Conn.Prepare("insert into entries (title, content, status) values(?, ?, ?)")
+	stmt, err := r.Conn.Prepare("insert into entries (title, content, status) values(?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(title, content, status)
+	res, err := stmt.Exec(e.Title, e.Content, int(e.Status))
 	if err != nil {
 		return 0, err
 	}
@@ -58,21 +52,22 @@ func (d *Datastore) SaveEntry(title, content string, status int) (int, error) {
 	return int(id), nil
 }
 
-// EditEntry changes the title and content of the entry
-func (d *Datastore) EditEntry(id int, title, content string) error {
-	stmt, err := d.Conn.Prepare("update entries set title=?, content=? where id=?")
+// Edit update the title and content of the entry
+func (r *EntryRepositoryImpl) Edit(e *domain.Entry) error {
+	stmt, err := r.Conn.Prepare("update entries set title=?, content=? where id=?")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(title, content, id)
+	_, err = stmt.Exec(e.Title, e.Content, e.ID)
 	return err
 }
 
-// DeleteEntry delets record when matched id, and returns number of deleted record and an error
-func (d *Datastore) DeleteEntry(id int) (bool, error) {
-	stmt, err := d.Conn.Prepare("delete from entries where id=?")
+// Delete delets record when matched id
+// Returns number of deleted record and an error
+func (r *EntryRepositoryImpl) Delete(id int) (bool, error) {
+	stmt, err := r.Conn.Prepare("delete from entries where id=?")
 	if err != nil {
 		return false, err
 	}

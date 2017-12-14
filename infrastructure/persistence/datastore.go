@@ -6,15 +6,16 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql" // mysql driver
+	"github.com/takashabe/lumber/domain/repository"
 )
 
-// Datastore represent MySQL adapter
-type Datastore struct {
+// SQLRepositoryAdapter provides accessors to the RDB
+type SQLRepositoryAdapter struct {
 	Conn *sql.DB
 }
 
 // NewDatastore returns initialized Datastore
-func NewDatastore() (*Datastore, error) {
+func NewDatastore() (repository.EntryRepository, error) {
 	getEnvWithDefault := func(name, def string) string {
 		if env := os.Getenv(name); len(env) != 0 {
 			return env
@@ -38,16 +39,13 @@ func NewDatastore() (*Datastore, error) {
 	db.SetMaxIdleConns(32)
 	db.SetMaxOpenConns(32)
 
-	return &Datastore{Conn: db}, nil
+	return &EntryRepositoryImpl{
+		&SQLRepositoryAdapter{Conn: db},
+	}, nil
 }
 
-// Close calls DB.Close
-func (d *Datastore) Close() error {
-	return d.Conn.Close()
-}
-
-func (d *Datastore) query(q string, args ...interface{}) (*sql.Rows, error) {
-	stmt, err := d.Conn.Prepare(q)
+func (a *SQLRepositoryAdapter) query(q string, args ...interface{}) (*sql.Rows, error) {
+	stmt, err := a.Conn.Prepare(q)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +54,8 @@ func (d *Datastore) query(q string, args ...interface{}) (*sql.Rows, error) {
 	return stmt.Query(args...)
 }
 
-func (d *Datastore) queryRow(q string, args ...interface{}) (*sql.Row, error) {
-	stmt, err := d.Conn.Prepare(q)
+func (a *SQLRepositoryAdapter) queryRow(q string, args ...interface{}) (*sql.Row, error) {
+	stmt, err := a.Conn.Prepare(q)
 	if err != nil {
 		return nil, err
 	}
