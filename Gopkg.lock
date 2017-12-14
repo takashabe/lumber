@@ -29,17 +29,23 @@
   branch = "master"
   name = "github.com/takashabe/go-fixture"
   packages = [".","mysql"]
-  revision = "99083852870b3b10d488fdda0230d3baf0e60c2e"
+  revision = "5392a35a25fcdc7e3ef2899859c9273e05600330"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/takashabe/go-router"
+  packages = ["."]
+  revision = "867abe915b8bc34ea891d8224e6369a69beeb188"
 
 [[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "10dabc7c96065724ec2de118dc80b571c9c83ef25b84d7839a6edc5602898ae9"
+  inputs-digest = "22fa6579e695d52cc224f8cfad4b2e586e6288f2b99d2040bf2b3bbeb5b236ba"
   solver-name = "gps-cdcl"
   solver-version = 1
