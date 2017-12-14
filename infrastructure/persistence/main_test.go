@@ -20,7 +20,10 @@ func setup() {
 	}
 	defer db.Close()
 
-	f := fixture.NewFixture(db.Conn, "mysql")
+	f, err := fixture.NewFixture(db.Conn, "mysql")
+	if err != nil {
+		panic(err)
+	}
 	err = f.LoadSQL("testdata/schema.sql")
 	if err != nil {
 		panic(err)

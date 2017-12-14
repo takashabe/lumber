@@ -18,7 +18,10 @@ func LoadFixture(t *testing.T, file string) {
 	}
 	defer db.Close()
 
-	f := fixture.NewFixture(db, "mysql")
+	f, err := fixture.NewFixture(db, "mysql")
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
 	err = f.Load(file)
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
@@ -33,7 +36,10 @@ func SetupTables() {
 	}
 	defer db.Close()
 
-	f := fixture.NewFixture(db, "mysql")
+	f, err := fixture.NewFixture(db, "mysql")
+	if err != nil {
+		panic(err)
+	}
 	err = f.LoadSQL("../_sql/schema.sql")
 	if err != nil {
 		panic(err)
