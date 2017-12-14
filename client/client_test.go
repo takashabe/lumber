@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/takashabe/lumber/helper"
-	"github.com/takashabe/lumber/server"
+	"github.com/takashabe/lumber/interfaces"
 )
 
 func setupServer(t *testing.T) *httptest.Server {
-	s, err := server.NewServer()
+	s, err := interfaces.NewServer()
 	if err != nil {
 		t.Fatalf("want non error, got %v", err)
 	}

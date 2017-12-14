@@ -1,4 +1,4 @@
-package datastore
+package persistence
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ func TestFindEntryByID(t *testing.T) {
 		t.Fatalf("want non error, got %v", err)
 	}
 	defer db.Close()
-	helper.LoadFixture(t, "fixture/entries.yml")
+	helper.LoadFixture(t, "testdata/entries.yml")
 
 	cases := []struct {
 		input     int
@@ -106,7 +106,7 @@ func TestEditEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 
 		err = db.EditEntry(c.inputID, c.inputTitle, c.inputContent)
 		if err != nil {
@@ -138,7 +138,7 @@ func TestDeleteEntry(t *testing.T) {
 		{0, false},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 
 		flag, err := db.DeleteEntry(c.input)
 		if err != nil {

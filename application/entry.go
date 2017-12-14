@@ -1,4 +1,4 @@
-package model
+package application
 
 import (
 	"strings"
@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/russross/blackfriday"
 	"github.com/takashabe/lumber/config"
-	"github.com/takashabe/lumber/datastore"
+	"github.com/takashabe/lumber/infrastructure/persistence"
 )
 
 // Entry provides operation for entries
@@ -86,7 +86,7 @@ func trimHTMLTag(s string) string {
 
 // GetEntry returns entry when matched id
 func GetEntry(id int) (*Entry, error) {
-	db, err := datastore.NewDatastore()
+	db, err := persistence.NewDatastore()
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (e *Entry) Post(s EntryStatus) (int, error) {
 		return 0, errors.Errorf("invalid entry status type: %d", s)
 	}
 
-	db, err := datastore.NewDatastore()
+	db, err := persistence.NewDatastore()
 	if err != nil {
 		return 0, err
 	}
@@ -124,7 +124,7 @@ func (e *Entry) Post(s EntryStatus) (int, error) {
 
 // Edit changes entry the title and content
 func (e *Entry) Edit() error {
-	db, err := datastore.NewDatastore()
+	db, err := persistence.NewDatastore()
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func (e *Entry) Edit() error {
 
 // Delete deletes entry
 func (e *Entry) Delete() error {
-	db, err := datastore.NewDatastore()
+	db, err := persistence.NewDatastore()
 	if err != nil {
 		return err
 	}

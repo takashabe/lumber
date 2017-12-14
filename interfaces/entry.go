@@ -1,16 +1,16 @@
-package server
+package interfaces
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/takashabe/lumber/model"
+	"github.com/takashabe/lumber/application"
 )
 
 // GetEntry returns entry when matched id
 func (s *Server) GetEntry(w http.ResponseWriter, r *http.Request, id int) {
-	entry, err := model.GetEntry(id)
+	entry, err := application.GetEntry(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
@@ -30,12 +30,12 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entry, err := model.NewEntry(raw.Data)
+	entry, err := application.NewEntry(raw.Data)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}
-	id, err := entry.Post(model.EntryStatus(raw.Status))
+	id, err := entry.Post(application.EntryStatus(raw.Status))
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
@@ -50,7 +50,7 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 
 // EditEntry change entry the title and content
 func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
-	_, err := model.GetEntry(id)
+	_, err := application.GetEntry(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
@@ -65,7 +65,7 @@ func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	entry, err := model.NewEntry(raw.Data)
+	entry, err := application.NewEntry(raw.Data)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to parse entry data")
 		return
@@ -81,7 +81,7 @@ func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
 
 // DeleteEntry deletes entry
 func (s *Server) DeleteEntry(w http.ResponseWriter, r *http.Request, id int) {
-	entry, err := model.GetEntry(id)
+	entry, err := application.GetEntry(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
