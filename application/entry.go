@@ -120,6 +120,11 @@ func (e *Entry) Post(s EntryStatus) (int, error) {
 	defer db.Close()
 
 	return db.SaveEntry(e.Title, e.Content, int(s))
+// EntryElement represent element of the entry operation method
+type EntryElement struct {
+	Title   string
+	Content string
+	Status  domain.EntryStatus
 }
 
 // Edit changes entry the title and content
@@ -127,10 +132,24 @@ func (e *Entry) Edit() error {
 	db, err := persistence.NewDatastore()
 	if err != nil {
 		return err
+// NewEntryElement returns initialized an EntryElement object
+func NewEntryElement(data []byte) (*EntryElement, error) {
+	title, content := extractTitleAndContent(data)
+	if len(title) == 0 || len(content) == 0 {
+		return nil, config.ErrEmptyEntry
 	}
 	defer db.Close()
+	return &EntryElement{
+		Title:   title,
+		Content: content,
+		Status:  domain.EntryStatusPublic,
+	}, nil
+}
 
 	return db.EditEntry(e.ID, e.Title, e.Content)
+// SetPublic set public status
+func (e *EntryElement) SetPublic() {
+	e.Status = domain.EntryStatusPublic
 }
 
 // Delete deletes entry
@@ -140,7 +159,18 @@ func (e *Entry) Delete() error {
 		return err
 	}
 	defer db.Close()
+// SetPrivate set private status
+func (e *EntryElement) SetPrivate() {
+	e.Status = domain.EntryStatusPrivate
+}
 
 	_, err = db.DeleteEntry(e.ID)
 	return err
+// Entity returns the entity from creating by the EntryElement
+func (e *EntryElement) Entity() *domain.Entry {
+	return &domain.Entry{
+		Title:   e.Title,
+		Content: e.Content,
+		Status:  e.Status,
+	}
 }
