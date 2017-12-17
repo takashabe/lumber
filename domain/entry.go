@@ -31,3 +31,8 @@ func (es EntryStatus) String() string {
 		return "unknown"
 	}
 }
+
+// IsValid returns whether the EntryStatus is valid
+func (es EntryStatus) IsValid() bool {
+	return es.String() != "unknown"
+}
