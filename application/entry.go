@@ -62,8 +62,10 @@ func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
 }
 
 // Edit changes entry the title and content
-func (i *EntryInteractor) Edit(e *EntryElement) error {
-	return i.repository.Edit(e.Entity())
+func (i *EntryInteractor) Edit(id int, e *EntryElement) error {
+	entity := e.Entity()
+	entity.ID = id
+	return i.repository.Edit(entity)
 }
 
 // Delete deletes entry
