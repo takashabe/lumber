@@ -16,8 +16,8 @@ type EntryInteractor struct {
 }
 
 // NewEntryInteractor returns initialized Entry object
-func NewEntryInteractor(repo repository.EntryRepository) (*EntryInteractor, error) {
-	return &EntryInteractor{repository: repo}, nil
+func NewEntryInteractor(repo repository.EntryRepository) *EntryInteractor {
+	return &EntryInteractor{repository: repo}
 }
 
 func extractTitleAndContent(data []byte) (title, content string) {
