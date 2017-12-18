@@ -7,10 +7,21 @@ import (
 	"testing"
 
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/domain/repository"
 	"github.com/takashabe/lumber/helper"
+	"github.com/takashabe/lumber/infrastructure/persistence"
 )
 
-func TestNewEntry(t *testing.T) {
+func getRepository(t *testing.T) repository.EntryRepository {
+	// TODO: selectable mock or production repository
+	r, err := persistence.NewDatastore()
+	if err != nil {
+		t.Fatalf("want non error, got %#v", err)
+	}
+	return r
+}
+
+func TestNewEntryElement(t *testing.T) {
 	cases := []struct {
 		inputFilePath     string
 		expectTitle       string
@@ -43,11 +54,11 @@ func TestNewEntry(t *testing.T) {
 	for i, c := range cases {
 		data, err := ioutil.ReadFile(c.inputFilePath)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		entry, err := NewEntry(data)
+		entry, err := NewEntryElement(data)
 		if err != c.expectErr {
-			t.Fatalf("#%d: want error %v, got %v", i, c.expectErr, err)
+			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectErr, err)
 		}
 		if err != nil {
 			continue
@@ -77,9 +88,10 @@ func TestGetEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		act, err := GetEntry(c.input)
+		interactor := NewEntryInteractor(getRepository(t))
+		act, err := interactor.Get(c.input)
 		if err != c.expectErr {
-			t.Fatalf("#%d: want error %v, got %v", i, c.expectErr, err)
+			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectErr, err)
 		}
 		if err != nil {
 			continue
@@ -91,7 +103,7 @@ func TestGetEntry(t *testing.T) {
 	}
 }
 
-func TestPost(t *testing.T) {
+func TestPostEntry(t *testing.T) {
 	cases := []struct {
 		inputFilePath string
 	}{
@@ -101,20 +113,21 @@ func TestPost(t *testing.T) {
 	for i, c := range cases {
 		data, err := ioutil.ReadFile(c.inputFilePath)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		entry, err := NewEntry(data)
+		element, err := NewEntryElement(data)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		_, err = entry.Post(EntryStatusPublic)
+		interactor := NewEntryInteractor(getRepository(t))
+		_, err = interactor.Post(element)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 	}
 }
 
-func TestEdit(t *testing.T) {
+func TestEditEntry(t *testing.T) {
 	cases := []struct {
 		inputID      int
 		inputData    []byte
@@ -126,27 +139,27 @@ func TestEdit(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		entry, err := NewEntry(c.inputData)
+		element, err := NewEntryElement(c.inputData)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		entry.ID = c.inputID
-		err = entry.Edit()
+		interactor := NewEntryInteractor(getRepository(t))
+		err = interactor.Edit(c.inputID, element)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 
-		editedEntry, err := GetEntry(c.inputID)
+		entry, err := interactor.Get(c.inputID)
 		if err != c.expectGetErr {
-			t.Fatalf("#%d: want error %v, got %v", i, c.expectGetErr, err)
+			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectGetErr, err)
 		}
 		if err != nil {
 			continue
 		}
 
-		if editedEntry.Title != entry.Title || editedEntry.Content != entry.Content {
+		if entry.Title != element.Title || entry.Content != element.Content {
 			t.Fatalf("#%d: want title %s and content %s, got title %s and content %s",
-				i, editedEntry.Title, editedEntry.Content, entry.Title, entry.Content)
+				i, entry.Title, entry.Content, element.Title, element.Content)
 		}
 	}
 }
@@ -161,16 +174,14 @@ func TestDelete(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		entry := &Entry{
-			ID: c.input,
-		}
-		err := entry.Delete()
+		interactor := NewEntryInteractor(getRepository(t))
+		err := interactor.Delete(c.input)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		_, err = GetEntry(c.input)
+		_, err = interactor.Get(c.input)
 		if err != sql.ErrNoRows {
-			t.Fatalf("#%d: want error sql.ErrNoRows, got %v", i, err)
+			t.Fatalf("#%d: want error sql.ErrNoRows, got %#v", i, err)
 		}
 	}
 }
