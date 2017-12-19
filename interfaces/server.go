@@ -78,7 +78,7 @@ func JSON(w http.ResponseWriter, code int, src interface{}) {
 
 // Server supply HTTP server
 type Server struct {
-	entry *EntryHandler
+	Entry *EntryHandler
 }
 
 // Routes returns router
@@ -86,10 +86,10 @@ func (s *Server) Routes() *router.Router {
 	r := router.NewRouter()
 
 	// For entries
-	r.Post("/api/entry/", s.entry.Post)
-	r.Get("/api/entry/:id", s.entry.Get)
-	r.Put("/api/entry/:id", s.entry.Edit)
-	r.Delete("/api/entry/:id", s.entry.Delete)
+	r.Post("/api/entry/", s.Entry.Post)
+	r.Get("/api/entry/:id", s.Entry.Get)
+	r.Put("/api/entry/:id", s.Entry.Edit)
+	r.Delete("/api/entry/:id", s.Entry.Delete)
 
 	return r
 }
