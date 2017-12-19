@@ -7,15 +7,19 @@ import (
 	"testing"
 
 	"github.com/takashabe/lumber/helper"
+	"github.com/takashabe/lumber/infrastructure/persistence"
 	"github.com/takashabe/lumber/interfaces"
 )
 
 func setupServer(t *testing.T) *httptest.Server {
-	s, err := interfaces.NewServer()
+	repo, err := persistence.NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	ts := httptest.NewServer(s.Routes())
+	server := &interfaces.Server{
+		Entry: interfaces.NewEntryHandler(repo),
+	}
+	ts := httptest.NewServer(server.Routes())
 	os.Setenv(LumberServerAddress, ts.URL)
 	return ts
 }
