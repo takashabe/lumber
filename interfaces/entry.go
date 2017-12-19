@@ -7,11 +7,19 @@ import (
 
 	"github.com/takashabe/lumber/application"
 	"github.com/takashabe/lumber/domain"
+	"github.com/takashabe/lumber/domain/repository"
 )
 
 // EntryHandler provides handler for the entry
 type EntryHandler struct {
 	interactor *application.EntryInteractor
+}
+
+// NewEntryHandler returns initialized EntryHandler
+func NewEntryHandler(repo repository.EntryRepository) *EntryHandler {
+	return &EntryHandler{
+		interactor: application.NewEntryInteractor(repo),
+	}
 }
 
 // Get returns entry when matched id

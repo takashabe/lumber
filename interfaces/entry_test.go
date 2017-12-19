@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/takashabe/lumber/application"
 	"github.com/takashabe/lumber/helper"
 	"github.com/takashabe/lumber/infrastructure/persistence"
 )
@@ -20,9 +19,7 @@ func setupServer(t *testing.T) *httptest.Server {
 		t.Fatalf("want non error, got %#v", err)
 	}
 	server := &Server{
-		Entry: &EntryHandler{
-			interactor: application.NewEntryInteractor(repo),
-		},
+		Entry: NewEntryHandler(repo),
 	}
 	return httptest.NewServer(server.Routes())
 }
