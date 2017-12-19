@@ -43,15 +43,15 @@ func TestCreateAndGetEntry(t *testing.T) {
 		ctx := context.Background()
 		client, err := New()
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		id, err := client.CreateEntry(ctx, c.input)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		entry, err := client.Entry(id).Get(ctx)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		if entry.ID != id {
 			t.Errorf("#%d: want id %d, got %d", i, id, entry.ID)
@@ -91,16 +91,16 @@ func TestEditEntry(t *testing.T) {
 		ctx := context.Background()
 		client, err := New()
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		entryClient := client.Entry(c.inputID)
 		err = entryClient.Edit(ctx, c.inputFile)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		entry, err := entryClient.Get(ctx)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		if entry.Title != c.expectTitle || entry.Content != c.expectContent {
 			t.Errorf("#%d: want title %s and content %s, got %s and %s",
@@ -125,11 +125,11 @@ func TestDeleteEntry(t *testing.T) {
 		ctx := context.Background()
 		client, err := New()
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		err = client.Entry(c.input).Delete(ctx)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 	}
 }
