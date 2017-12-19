@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/domain"
 	"github.com/takashabe/lumber/helper"
 )
 
-func TestFindEntryByID(t *testing.T) {
+func TestGetEntry(t *testing.T) {
 	db, err := NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	defer db.Close()
 	helper.LoadFixture(t, "testdata/entries.yml")
 
 	cases := []struct {
@@ -26,9 +26,9 @@ func TestFindEntryByID(t *testing.T) {
 		{0, 0, sql.ErrNoRows},
 	}
 	for i, c := range cases {
-		model, err := db.FindEntryByID(c.input)
+		model, err := db.Get(c.input)
 		if err != c.expectErr {
-			t.Errorf("#%d: want error %v, got %v", i, c.expectErr, err)
+			t.Errorf("#%d: want error %#v, got %#v", i, c.expectErr, err)
 		}
 
 		if model.ID != c.expectID {
@@ -40,15 +40,14 @@ func TestFindEntryByID(t *testing.T) {
 func TestSaveEntry(t *testing.T) {
 	db, err := NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	defer db.Close()
 
 	stringWithBytes := func(size int) string {
 		buf := bytes.NewBuffer(make([]byte, 0, size))
 		for i := 0; i < size; i++ {
 			if err := buf.WriteByte('a'); err != nil {
-				t.Fatalf("want non error, got %v", err)
+				t.Fatalf("want non error, got %#v", err)
 			}
 		}
 		return buf.String()
@@ -80,9 +79,14 @@ func TestSaveEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		_, err := db.SaveEntry(c.inputTitle, c.inputContent, c.inputStatus)
+		entity := &domain.Entry{
+			Title:   c.inputTitle,
+			Content: c.inputContent,
+			Status:  domain.EntryStatus(c.inputStatus),
+		}
+		_, err := db.Save(entity)
 		if err != c.expectErr {
-			t.Errorf("#%d: want error %v, got %v", i, c.expectErr, err)
+			t.Errorf("#%d: want error %#v, got %#v", i, c.expectErr, err)
 		}
 	}
 }
@@ -90,9 +94,8 @@ func TestSaveEntry(t *testing.T) {
 func TestEditEntry(t *testing.T) {
 	db, err := NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	defer db.Close()
 
 	cases := []struct {
 		inputID      int
@@ -108,13 +111,18 @@ func TestEditEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		err = db.EditEntry(c.inputID, c.inputTitle, c.inputContent)
-		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+		entity := &domain.Entry{
+			ID:      c.inputID,
+			Title:   c.inputTitle,
+			Content: c.inputContent,
 		}
-		e, err := db.FindEntryByID(c.inputID)
+		err = db.Edit(entity)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		e, err := db.Get(c.inputID)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		if e.Title != c.inputTitle || e.Content != c.inputContent {
 			t.Errorf("#%d: want title %s and content %s, but title %s and content %s",
@@ -126,9 +134,8 @@ func TestEditEntry(t *testing.T) {
 func TestDeleteEntry(t *testing.T) {
 	db, err := NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	defer db.Close()
 
 	cases := []struct {
 		input  int
@@ -140,12 +147,12 @@ func TestDeleteEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		flag, err := db.DeleteEntry(c.input)
+		flag, err := db.Delete(c.input)
 		if err != nil {
-			t.Fatalf("want non error, got %v", err)
+			t.Fatalf("want non error, got %#v", err)
 		}
 		if flag != c.expect {
-			t.Errorf("#%d: want error %v, got %v", i, c.expect, err)
+			t.Errorf("#%d: want error %#v, got %#v", i, c.expect, err)
 		}
 	}
 }

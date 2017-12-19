@@ -18,9 +18,9 @@ func setup() {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
-	f, err := fixture.NewFixture(db.Conn, "mysql")
+	impl := db.(*EntryRepositoryImpl)
+	f, err := fixture.NewFixture(impl.Conn, "mysql")
 	if err != nil {
 		panic(err)
 	}
