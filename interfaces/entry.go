@@ -11,7 +11,7 @@ import (
 
 // EntryHandler provides handler for the entry
 type EntryHandler struct {
-	interactor application.EntryInteractor
+	interactor *application.EntryInteractor
 }
 
 // Get returns entry when matched id

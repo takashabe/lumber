@@ -9,25 +9,32 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/takashabe/lumber/application"
 	"github.com/takashabe/lumber/helper"
+	"github.com/takashabe/lumber/infrastructure/persistence"
 )
 
 func setupServer(t *testing.T) *httptest.Server {
-	s, err := NewServer()
+	repo, err := persistence.NewDatastore()
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
-	return httptest.NewServer(s.Routes())
+	server := &Server{
+		Entry: &EntryHandler{
+			interactor: application.NewEntryInteractor(repo),
+		},
+	}
+	return httptest.NewServer(server.Routes())
 }
 
 func sendRequest(t *testing.T, method, url string, body io.Reader) *http.Response {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		t.Fatalf("want non error, got %v", err)
+		t.Fatalf("want non error, got %#v", err)
 	}
 	return res
 }
@@ -86,7 +93,7 @@ func TestPostEntry(t *testing.T) {
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		res := sendRequest(t, "POST", fmt.Sprintf("%s/api/entry/", ts.URL), &buf)
 		defer res.Body.Close()
@@ -134,7 +141,7 @@ func TestEditEntry(t *testing.T) {
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.inputPayload)
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %v", i, err)
+			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
 		res := sendRequest(t, "PUT", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.inputID), &buf)
 		defer res.Body.Close()
