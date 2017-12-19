@@ -6,11 +6,17 @@ import (
 	"net/http"
 
 	"github.com/takashabe/lumber/application"
+	"github.com/takashabe/lumber/domain"
 )
 
-// GetEntry returns entry when matched id
-func (s *Server) GetEntry(w http.ResponseWriter, r *http.Request, id int) {
-	entry, err := application.GetEntry(id)
+// EntryHandler provides handler for the entry
+type EntryHandler struct {
+	interactor application.EntryInteractor
+}
+
+// Get returns entry when matched id
+func (h *EntryHandler) Get(w http.ResponseWriter, r *http.Request, id int) {
+	entry, err := h.interactor.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
@@ -18,8 +24,8 @@ func (s *Server) GetEntry(w http.ResponseWriter, r *http.Request, id int) {
 	JSON(w, http.StatusOK, entry)
 }
 
-// PostEntry create new entry
-func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
+// Post create new entry
+func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 	raw := struct {
 		Data   []byte `json:"data"`
 		Status int    `json:"status"`
@@ -30,16 +36,18 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entry, err := application.NewEntry(raw.Data)
+	element, err := application.NewEntryElement(raw.Data)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}
-	id, err := entry.Post(application.EntryStatus(raw.Status))
+	element.Status = domain.EntryStatus(raw.Status)
+	id, err := h.interactor.Post(element)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}
+
 	response := struct {
 		ID int `json:"id"`
 	}{
@@ -48,9 +56,9 @@ func (s *Server) PostEntry(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, response)
 }
 
-// EditEntry change entry the title and content
-func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
-	_, err := application.GetEntry(id)
+// Edit change entry the title and content
+func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
+	entry, err := h.interactor.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
@@ -65,13 +73,13 @@ func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 
-	entry, err := application.NewEntry(raw.Data)
+	element, err := application.NewEntryElement(raw.Data)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to parse entry data")
 		return
 	}
-	entry.ID = id
-	err = entry.Edit()
+	element.Status = entry.Status
+	err = h.interactor.Edit(id, element)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to edit entry")
 		return
@@ -79,14 +87,15 @@ func (s *Server) EditEntry(w http.ResponseWriter, r *http.Request, id int) {
 	JSON(w, http.StatusOK, nil)
 }
 
-// DeleteEntry deletes entry
-func (s *Server) DeleteEntry(w http.ResponseWriter, r *http.Request, id int) {
-	entry, err := application.GetEntry(id)
+// Delete deletes entry
+func (h *EntryHandler) Delete(w http.ResponseWriter, r *http.Request, id int) {
+	_, err := h.interactor.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
 	}
-	err = entry.Delete()
+
+	err = h.interactor.Delete(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to delete entry")
 		return

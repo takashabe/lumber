@@ -78,12 +78,7 @@ func JSON(w http.ResponseWriter, code int, src interface{}) {
 
 // Server supply HTTP server
 type Server struct {
-	port int
-}
-
-// NewServer returns initialized Server
-func NewServer() (*Server, error) {
-	return &Server{}, nil
+	entry *EntryHandler
 }
 
 // Routes returns router
@@ -91,10 +86,10 @@ func (s *Server) Routes() *router.Router {
 	r := router.NewRouter()
 
 	// For entries
-	r.Post("/api/entry/", s.PostEntry)
-	r.Get("/api/entry/:id", s.GetEntry)
-	r.Put("/api/entry/:id", s.EditEntry)
-	r.Delete("/api/entry/:id", s.DeleteEntry)
+	r.Post("/api/entry/", s.entry.Post)
+	r.Get("/api/entry/:id", s.entry.Get)
+	r.Put("/api/entry/:id", s.entry.Edit)
+	r.Delete("/api/entry/:id", s.entry.Delete)
 
 	return r
 }
