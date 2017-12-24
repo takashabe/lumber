@@ -58,12 +58,7 @@ func (r *TokenRepositoryImpl) Save(m *domain.Token) (int, error) {
 }
 
 // Update update the value
-func (r *EntryRepositoryImpl) Update(e *domain.Entry) error {
-	_, err := r.FindByValue(m.Value)
-	if err == nil {
-		return 0, errors.New("failed to save token. A record with the same value already exists")
-	}
-
+func (r *TokenRepositoryImpl) Update(m *domain.Token) error {
 	stmt, err := r.Conn.Prepare("update tokens set value=? where id=?")
 	if err != nil {
 		return err
