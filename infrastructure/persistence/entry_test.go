@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetEntry(t *testing.T) {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}
@@ -38,7 +38,7 @@ func TestGetEntry(t *testing.T) {
 }
 
 func TestSaveEntry(t *testing.T) {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}
@@ -92,7 +92,7 @@ func TestSaveEntry(t *testing.T) {
 }
 
 func TestEditEntry(t *testing.T) {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}
@@ -132,7 +132,7 @@ func TestEditEntry(t *testing.T) {
 }
 
 func TestDeleteEntry(t *testing.T) {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}

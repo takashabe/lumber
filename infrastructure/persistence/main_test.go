@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		panic(err)
 	}

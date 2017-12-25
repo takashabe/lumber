@@ -14,7 +14,7 @@ import (
 )
 
 func setupServer(t *testing.T) *httptest.Server {
-	repo, err := persistence.NewDatastore()
+	repo, err := persistence.NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}

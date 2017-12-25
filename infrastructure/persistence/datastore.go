@@ -14,8 +14,8 @@ type SQLRepositoryAdapter struct {
 	Conn *sql.DB
 }
 
-// NewDatastore returns initialized Datastore
-func NewDatastore() (repository.EntryRepository, error) {
+// NewEntryRepository returns initialized Datastore
+func NewEntryRepository() (repository.EntryRepository, error) {
 	getEnvWithDefault := func(name, def string) string {
 		if env := os.Getenv(name); len(env) != 0 {
 			return env

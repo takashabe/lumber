@@ -14,7 +14,7 @@ import (
 
 func getRepository(t *testing.T) repository.EntryRepository {
 	// TODO: selectable mock or production repository
-	r, err := persistence.NewDatastore()
+	r, err := persistence.NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}

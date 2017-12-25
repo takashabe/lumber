@@ -8,11 +8,11 @@ import (
 )
 
 func TestGetToken(t *testing.T) {
-	db, err := NewDatastore()
+	db, err := NewEntryRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}
-	helper.LoadFixture(t, "testdata/entries.yml")
+	helper.LoadFixture(t, "testdata/tokens.yml")
 
 	cases := []struct {
 		input     int
