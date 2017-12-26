@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS entries (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS tokens (
-  `id`         int          NOT NULL,
-  `value`      varchar(256) NOT NULL,
+  `id`         int          NOT NULL AUTO_INCREMENT,
+  `value`      varchar(256) NOT NULL UNIQUE,
   `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
