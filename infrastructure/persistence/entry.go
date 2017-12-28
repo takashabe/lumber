@@ -5,11 +5,25 @@ import (
 
 	"github.com/takashabe/lumber/config"
 	"github.com/takashabe/lumber/domain"
+	"github.com/takashabe/lumber/domain/repository"
+	"github.com/takashabe/lumber/infrastructure/utils"
 )
 
 // EntryRepositoryImpl implements the EntryRepository
 type EntryRepositoryImpl struct {
 	*SQLRepositoryAdapter
+}
+
+// NewEntryRepository returns initialized Datastore
+func NewEntryRepository() (repository.EntryRepository, error) {
+	db, err := utils.ConnectMySQL()
+	if err != nil {
+		return nil, err
+	}
+
+	return &EntryRepositoryImpl{
+		&SQLRepositoryAdapter{Conn: db},
+	}, nil
 }
 
 func (r *EntryRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Entry, error) {
