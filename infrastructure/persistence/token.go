@@ -40,7 +40,7 @@ func (r *TokenRepositoryImpl) FindByValue(value string) (*domain.Token, error) {
 func (r *TokenRepositoryImpl) Save(m *domain.Token) (int, error) {
 	_, err := r.FindByValue(m.Value)
 	if err == nil {
-		return 0, errors.New("failed to save token. A record with the same value already exists")
+		return 0, domain.ErrTokenAlreadyExistSameValue
 	}
 
 	stmt, err := r.Conn.Prepare("insert into tokens (value) values(?)")
