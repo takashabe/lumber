@@ -3,13 +3,26 @@ package persistence
 import (
 	"database/sql"
 
-	"github.com/pkg/errors"
 	"github.com/takashabe/lumber/domain"
+	"github.com/takashabe/lumber/domain/repository"
+	"github.com/takashabe/lumber/infrastructure/utils"
 )
 
 // TokenRepositoryImpl implements the TokenRepository
 type TokenRepositoryImpl struct {
 	*SQLRepositoryAdapter
+}
+
+// NewTokenRepository returns initialized Datastore
+func NewTokenRepository() (repository.TokenRepository, error) {
+	db, err := utils.ConnectMySQL()
+	if err != nil {
+		return nil, err
+	}
+
+	return &TokenRepositoryImpl{
+		&SQLRepositoryAdapter{Conn: db},
+	}, nil
 }
 
 func (r *TokenRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Token, error) {
