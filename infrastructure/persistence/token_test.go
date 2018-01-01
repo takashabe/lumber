@@ -1,7 +1,6 @@
 package persistence
 
 import (
-	"database/sql"
 	"testing"
 
 	"github.com/takashabe/lumber/domain"
@@ -21,12 +20,15 @@ func TestGetToken(t *testing.T) {
 		expectErr error
 	}{
 		{1, 1, nil},
-		{0, 0, sql.ErrNoRows},
+		{0, 0, domain.ErrNotFoundToken},
 	}
 	for i, c := range cases {
 		token, err := repo.Get(c.input)
 		if err != c.expectErr {
 			t.Errorf("#%d: want error %#v, got %#v", i, c.expectErr, err)
+		}
+		if err != nil {
+			continue
 		}
 
 		if token.ID != c.expectID {
@@ -49,12 +51,15 @@ func TestFindByValueToken(t *testing.T) {
 	}{
 		{"foo", 1, nil},
 		{"bar", 2, nil},
-		{"", 0, sql.ErrNoRows},
+		{"", 0, domain.ErrNotFoundToken},
 	}
 	for i, c := range cases {
 		token, err := repo.FindByValue(c.input)
 		if err != c.expectErr {
 			t.Errorf("#%d: want error %#v, got %#v", i, c.expectErr, err)
+		}
+		if err != nil {
+			continue
 		}
 
 		if token.ID != c.expectID {

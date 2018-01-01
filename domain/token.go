@@ -17,4 +17,5 @@ type Token struct {
 // Token errors
 var (
 	ErrTokenAlreadyExistSameValue = errors.New("failed to save token. A record with the same value already exists")
+	ErrNotFoundToken              = errors.New("failed to not found token")
 )

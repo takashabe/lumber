@@ -35,9 +35,14 @@ func (r *TokenRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Token, error) {
 func (r *TokenRepositoryImpl) Get(id int) (*domain.Token, error) {
 	row, err := r.queryRow("select * from tokens where id=?", id)
 	if err != nil {
+
 		return nil, err
 	}
-	return r.mapToEntity(row)
+	d, err := r.mapToEntity(row)
+	if err != nil && err == sql.ErrNoRows {
+		return nil, domain.ErrNotFoundToken
+	}
+	return d, err
 }
 
 // FindByValue return a token record matched by 'value'
@@ -46,7 +51,11 @@ func (r *TokenRepositoryImpl) FindByValue(value string) (*domain.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.mapToEntity(row)
+	d, err := r.mapToEntity(row)
+	if err != nil && err == sql.ErrNoRows {
+		return nil, domain.ErrNotFoundToken
+	}
+	return d, err
 }
 
 // Save saves token data to datastore
