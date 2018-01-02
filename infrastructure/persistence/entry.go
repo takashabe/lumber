@@ -28,13 +28,13 @@ func NewEntryRepository() (repository.EntryRepository, error) {
 
 func (r *EntryRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Entry, error) {
 	m := &domain.Entry{}
-	err := row.Scan(&m.ID, &m.Title, &m.Content, &m.Status, &m.CreatedAt, &m.UpdatedAt)
+	err := row.Scan(&m.ID, &m.Title, &m.Content, &m.Status)
 	return m, err
 }
 
 // Get return a entry record matched by 'id'
 func (r *EntryRepositoryImpl) Get(id int) (*domain.Entry, error) {
-	row, err := r.queryRow("select * from entries where id=?", id)
+	row, err := r.queryRow("select id, title, content,  status from entries where id=?", id)
 	if err != nil {
 		return nil, err
 	}

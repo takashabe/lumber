@@ -27,13 +27,13 @@ func NewTokenRepository() (repository.TokenRepository, error) {
 
 func (r *TokenRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Token, error) {
 	m := &domain.Token{}
-	err := row.Scan(&m.ID, &m.Value, &m.CreatedAt, &m.UpdatedAt)
+	err := row.Scan(&m.ID, &m.Value)
 	return m, err
 }
 
 // Get return a token record matched by 'id'
 func (r *TokenRepositoryImpl) Get(id int) (*domain.Token, error) {
-	row, err := r.queryRow("select * from tokens where id=?", id)
+	row, err := r.queryRow("select id, value from tokens where id=?", id)
 	if err != nil {
 
 		return nil, err
@@ -47,7 +47,7 @@ func (r *TokenRepositoryImpl) Get(id int) (*domain.Token, error) {
 
 // FindByValue return a token record matched by 'value'
 func (r *TokenRepositoryImpl) FindByValue(value string) (*domain.Token, error) {
-	row, err := r.queryRow("select * from tokens where value=?", value)
+	row, err := r.queryRow("select id, value from tokens where value=?", value)
 	if err != nil {
 		return nil, err
 	}

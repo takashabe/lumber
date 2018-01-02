@@ -1,17 +1,13 @@
 package domain
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
 )
 
 // Token represent the token entity
 type Token struct {
-	ID        int
-	Value     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID    int
+	Value string
 }
 
 // Token errors

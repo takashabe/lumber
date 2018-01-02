@@ -1,15 +1,11 @@
 package domain
 
-import "time"
-
 // Entry represent the entry entity
 type Entry struct {
-	ID        int
-	Title     string
-	Content   string
-	Status    EntryStatus
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID      int
+	Title   string
+	Content string
+	Status  EntryStatus
 }
 
 // EntryStatus represent status of the entries
