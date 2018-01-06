@@ -48,7 +48,7 @@ func TestGetEntry(t *testing.T) {
 		{0, http.StatusNotFound},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
 		defer res.Body.Close()
 
@@ -86,7 +86,7 @@ func TestPostEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {
@@ -134,7 +134,7 @@ func TestEditEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.inputPayload)
 		if err != nil {
@@ -161,7 +161,7 @@ func TestDeleteEntry(t *testing.T) {
 		{0, http.StatusNotFound},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "fixture/entries.yml")
+		helper.LoadFixture(t, "testdata/entries.yml")
 		res := sendRequest(t, "DELETE", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
 		defer res.Body.Close()
 
