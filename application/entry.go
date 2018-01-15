@@ -58,7 +58,10 @@ func (i *EntryInteractor) Get(id int) (*domain.Entry, error) {
 }
 
 // Post saves the posted data in the background datastore
-func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
+func (i *EntryInteractor) Post(e *EntryElement, token string) (int, error) {
+	if err := authenticateByToken(i.tokenRepo, token); err != nil {
+		return 0, err
+	}
 	if !e.Status.IsValid() {
 		return 0, errors.Errorf("invalid entry status type: %d", e.Status)
 	}
@@ -66,15 +69,20 @@ func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
 }
 
 // Edit changes entry the title and content
-func (i *EntryInteractor) Edit(id int, e *EntryElement) error {
+func (i *EntryInteractor) Edit(id int, e *EntryElement, token string) error {
+	if err := authenticateByToken(i.tokenRepo, token); err != nil {
+		return err
+	}
 	entity := e.Entity()
 	entity.ID = id
 	return i.entryRepo.Edit(entity)
 }
 
 // Delete deletes entry
-func (i *EntryInteractor) Delete(id int) error {
-	_, err := i.repository.Delete(id)
+func (i *EntryInteractor) Delete(id int, token string) error {
+	if err := authenticateByToken(i.tokenRepo, token); err != nil {
+		return err
+	}
 	_, err := i.entryRepo.Delete(id)
 	return err
 }

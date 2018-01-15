@@ -6,20 +6,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/takashabe/lumber/config"
-	"github.com/takashabe/lumber/domain/repository"
 	"github.com/takashabe/lumber/helper"
-	"github.com/takashabe/lumber/infrastructure/persistence"
 )
-
-func getRepository(t *testing.T) repository.EntryRepository {
-	// TODO: selectable mock or production repository
-	r, err := persistence.NewEntryRepository()
-	if err != nil {
-		t.Fatalf("want non error, got %#v", err)
-	}
-	return r
-}
 
 func TestNewEntryElement(t *testing.T) {
 	cases := []struct {
@@ -88,7 +78,7 @@ func TestGetEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		interactor := NewEntryInteractor(getRepository(t))
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
 		act, err := interactor.Get(c.input)
 		if err != c.expectErr {
 			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectErr, err)
@@ -106,9 +96,12 @@ func TestGetEntry(t *testing.T) {
 func TestPostEntry(t *testing.T) {
 	cases := []struct {
 		inputFilePath string
+		token         string
+		expectErr     error
 	}{
-		{"testdata/go-pubsub_readme.md"},
-		{"testdata/minimum.md"},
+		{"testdata/go-pubsub_readme.md", "foo", nil},
+		{"testdata/minimum.md", "foo", nil},
+		{"testdata/minimum.md", "", config.ErrInsufficientPrivileges},
 	}
 	for i, c := range cases {
 		data, err := ioutil.ReadFile(c.inputFilePath)
@@ -119,22 +112,25 @@ func TestPostEntry(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		interactor := NewEntryInteractor(getRepository(t))
-		_, err = interactor.Post(element)
-		if err != nil {
-			t.Fatalf("#%d: want non error, got %#v", i, err)
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		_, err = interactor.Post(element, c.token)
+		if errors.Cause(err) != c.expectErr {
+			t.Fatalf("#%d: want %#v, got %#v", i, c.expectErr, err)
 		}
 	}
 }
 
 func TestEditEntry(t *testing.T) {
 	cases := []struct {
-		inputID      int
-		inputData    []byte
-		expectGetErr error
+		inputID       int
+		inputData     []byte
+		token         string
+		expectEditErr error
+		expectGetErr  error
 	}{
-		{1, []byte("# title\n\n## content"), nil},
-		{0, []byte("# title\n\n## content"), sql.ErrNoRows},
+		{1, []byte("# title\n\n## content"), "foo", nil, nil},
+		{0, []byte("# title\n\n## content"), "foo", nil, sql.ErrNoRows},
+		{1, []byte("# title\n\n## content"), "", config.ErrInsufficientPrivileges, nil},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
@@ -143,14 +139,17 @@ func TestEditEntry(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		interactor := NewEntryInteractor(getRepository(t))
-		err = interactor.Edit(c.inputID, element)
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		err = interactor.Edit(c.inputID, element, c.token)
+		if errors.Cause(err) != c.expectEditErr {
+			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectEditErr, err)
+		}
 		if err != nil {
-			t.Fatalf("#%d: want non error, got %#v", i, err)
+			continue
 		}
 
 		entry, err := interactor.Get(c.inputID)
-		if err != c.expectGetErr {
+		if errors.Cause(err) != c.expectGetErr {
 			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectGetErr, err)
 		}
 		if err != nil {
@@ -166,19 +165,26 @@ func TestEditEntry(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	cases := []struct {
-		input int
+		input     int
+		token     string
+		expectErr error
 	}{
-		{1},
-		{0},
+		{1, "foo", nil},
+		{0, "foo", nil},
+		{1, "", config.ErrInsufficientPrivileges},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		interactor := NewEntryInteractor(getRepository(t))
-		err := interactor.Delete(c.input)
-		if err != nil {
-			t.Fatalf("#%d: want non error, got %#v", i, err)
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		err := interactor.Delete(c.input, c.token)
+		if errors.Cause(err) != c.expectErr {
+			t.Fatalf("#%d: want %#v, got %#v", i, c.expectErr, err)
 		}
+		if err != nil {
+			continue
+		}
+
 		_, err = interactor.Get(c.input)
 		if err != sql.ErrNoRows {
 			t.Fatalf("#%d: want error sql.ErrNoRows, got %#v", i, err)
