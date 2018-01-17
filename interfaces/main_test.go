@@ -23,7 +23,7 @@ func setupServer(t *testing.T) *httptest.Server {
 		t.Fatalf("want non error, got %#v", err)
 	}
 	server := &Server{
-		Entry: NewEntryHandler(entryRepo),
+		Entry: NewEntryHandler(entryRepo, tokenRepo),
 		Token: NewTokenHandler(tokenRepo),
 	}
 	return httptest.NewServer(server.Routes())

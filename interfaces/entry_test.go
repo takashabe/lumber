@@ -42,6 +42,7 @@ func TestPostEntry(t *testing.T) {
 	}
 	cases := []struct {
 		input  postPayload
+		token  string
 		expect int
 	}{
 		{
@@ -49,6 +50,7 @@ func TestPostEntry(t *testing.T) {
 				Data:   []byte("# title\n\n## content"),
 				Status: 1,
 			},
+			"foo",
 			http.StatusOK,
 		},
 		{
@@ -56,17 +58,27 @@ func TestPostEntry(t *testing.T) {
 				Data:   []byte("# title\n\n## content"),
 				Status: 99,
 			},
+			"foo",
 			http.StatusNotFound,
+		},
+		{
+			postPayload{
+				Data:   []byte("# title\n\n## content"),
+				Status: 1,
+			},
+			"",
+			http.StatusBadRequest,
 		},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
+		helper.LoadFixture(t, "testdata/tokens.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		res := sendRequest(t, "POST", fmt.Sprintf("%s/api/entry/", ts.URL), &buf)
+		res := sendRequest(t, "POST", fmt.Sprintf("%s/api/entry/?token=%s", ts.URL, c.token), &buf)
 		defer res.Body.Close()
 
 		if res.StatusCode != c.expect {
@@ -85,6 +97,7 @@ func TestEditEntry(t *testing.T) {
 	cases := []struct {
 		inputID      int
 		inputPayload editPayload
+		token        string
 		expect       int
 	}{
 		{
@@ -92,11 +105,13 @@ func TestEditEntry(t *testing.T) {
 			editPayload{
 				Data: []byte("# title\n\n## content"),
 			},
+			"foo",
 			http.StatusOK,
 		},
 		{
 			1,
 			editPayload{},
+			"foo",
 			http.StatusNotFound,
 		},
 		{
@@ -104,7 +119,16 @@ func TestEditEntry(t *testing.T) {
 			editPayload{
 				Data: []byte("# title\n\n## content"),
 			},
+			"foo",
 			http.StatusNotFound,
+		},
+		{
+			1,
+			editPayload{
+				Data: []byte("# title\n\n## content"),
+			},
+			"",
+			http.StatusBadRequest,
 		},
 	}
 	for i, c := range cases {
@@ -114,7 +138,7 @@ func TestEditEntry(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		res := sendRequest(t, "PUT", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.inputID), &buf)
+		res := sendRequest(t, "PUT", fmt.Sprintf("%s/api/entry/%d?token=%s", ts.URL, c.inputID, c.token), &buf)
 		defer res.Body.Close()
 
 		if res.StatusCode != c.expect {
@@ -129,14 +153,16 @@ func TestDeleteEntry(t *testing.T) {
 
 	cases := []struct {
 		input  int
+		token  string
 		expect int
 	}{
-		{1, http.StatusOK},
-		{0, http.StatusNotFound},
+		{1, "foo", http.StatusOK},
+		{0, "foo", http.StatusNotFound},
+		{1, "", http.StatusBadRequest},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
-		res := sendRequest(t, "DELETE", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
+		res := sendRequest(t, "DELETE", fmt.Sprintf("%s/api/entry/%d?token=%s", ts.URL, c.input, c.token), nil)
 		defer res.Body.Close()
 
 		if res.StatusCode != c.expect {

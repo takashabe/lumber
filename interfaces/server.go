@@ -24,7 +24,7 @@ type ErrorResponse struct {
 }
 
 func (e *ErrorResponse) String() string {
-	return fmt.Sprintf("reason: %s, error: %s", e.Message, e.Error.Error())
+	return fmt.Sprintf("reason: %s, error: %#v", e.Message, e.Error)
 }
 
 // Respond is response write to ResponseWriter
