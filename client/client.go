@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,7 +16,7 @@ import (
 // Constants related to environment variables
 const (
 	LumberServerAddress = "lumber_server_address"
-	LumberSessionToken  = "lumber_session_token"
+	LumberToken         = "lumber_session_token"
 )
 
 // Client represent a client for the lumber server
@@ -26,6 +27,7 @@ type Client struct {
 
 // New returns initialized client
 func New() (*Client, error) {
+	token := os.Getenv(LumberToken)
 	addr := os.Getenv(LumberServerAddress)
 	if len(addr) == 0 {
 		return nil, errors.New("Require settings server address in environment variable")
@@ -39,12 +41,16 @@ func New() (*Client, error) {
 
 	return &Client{
 		addr:  addr,
-		token: os.Getenv(LumberSessionToken),
+		token: token,
 	}, nil
 }
 
 // CreateEntry submit markdown file as a new entry
 func (c *Client) CreateEntry(ctx context.Context, file string) (int, error) {
+	if len(c.token) == 0 {
+		return 0, ErrRequireToken
+	}
+
 	f, err := ioutil.ReadFile(file)
 	if err != nil {
 		return 0, err
@@ -64,7 +70,7 @@ func (c *Client) CreateEntry(ctx context.Context, file string) (int, error) {
 		return 0, err
 	}
 
-	req, err := http.NewRequest("POST", c.addr+"api/entry", &buf)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%sapi/entry?token=%s", c.addr, c.token), &buf)
 	if err != nil {
 		return 0, err
 	}

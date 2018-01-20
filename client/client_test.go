@@ -12,12 +12,14 @@ import (
 )
 
 func setupServer(t *testing.T) *httptest.Server {
-	repo, err := persistence.NewEntryRepository()
+	er, err := persistence.NewEntryRepository()
+	tr, err := persistence.NewTokenRepository()
 	if err != nil {
 		t.Fatalf("want non error, got %#v", err)
 	}
 	server := &interfaces.Server{
-		Entry: interfaces.NewEntryHandler(repo),
+		Entry: interfaces.NewEntryHandler(er, tr),
+		Token: interfaces.NewTokenHandler(tr),
 	}
 	ts := httptest.NewServer(server.Routes())
 	os.Setenv(LumberServerAddress, ts.URL)

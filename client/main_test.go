@@ -8,6 +8,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	helper.SetupTables()
+	setup()
 	os.Exit(m.Run())
+}
+
+func setup() {
+	helper.SetupTables()
+	os.Setenv(LumberToken, "foo")
 }

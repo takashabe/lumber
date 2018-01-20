@@ -50,6 +50,10 @@ func (e *Entry) Get(ctx context.Context) (*EntryContent, error) {
 
 // Edit submit makrdown file as an entry
 func (e *Entry) Edit(ctx context.Context, file string) error {
+	if len(e.token) == 0 {
+		return ErrRequireToken
+	}
+
 	f, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
@@ -67,7 +71,7 @@ func (e *Entry) Edit(ctx context.Context, file string) error {
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%sapi/entry/%d", e.addr, e.id), &buf)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%sapi/entry/%d?token=%s", e.addr, e.id, e.token), &buf)
 	if err != nil {
 		return err
 	}
@@ -81,7 +85,11 @@ func (e *Entry) Edit(ctx context.Context, file string) error {
 
 // Delete submit makrdown file as an entry
 func (e *Entry) Delete(ctx context.Context) error {
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%sapi/entry/%d", e.addr, e.id), nil)
+	if len(e.token) == 0 {
+		return ErrRequireToken
+	}
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%sapi/entry/%d?token=%s", e.addr, e.id, e.token), nil)
 	if err != nil {
 		return err
 	}
