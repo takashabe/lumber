@@ -93,7 +93,6 @@ func (s *Server) Routes() *router.Router {
 	r.Delete("/api/entry/:id", s.Entry.Delete)
 
 	// For tokens
-	r.Post("/api/token/", s.Token.New)
 	r.Get("/api/token/:id", s.Token.Get)
 	r.Get("/api/token/value/:value", s.Token.FindByValue)
 

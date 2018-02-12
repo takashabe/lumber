@@ -51,17 +51,3 @@ func TestFindByValueToken(t *testing.T) {
 		}
 	}
 }
-
-func TestNewToken(t *testing.T) {
-	ts := setupServer(t)
-	defer ts.Close()
-
-	expectCode := http.StatusCreated
-
-	res := sendRequest(t, "POST", fmt.Sprintf("%s/api/token/", ts.URL), nil)
-	defer res.Body.Close()
-
-	if res.StatusCode != expectCode {
-		t.Errorf("want %d, got %d", expectCode, res.StatusCode)
-	}
-}
