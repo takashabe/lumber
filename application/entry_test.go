@@ -104,6 +104,8 @@ func TestPostEntry(t *testing.T) {
 		{"testdata/minimum.md", "", config.ErrInsufficientPrivileges},
 	}
 	for i, c := range cases {
+		helper.LoadFixture(t, "testdata/tokens.yml")
+
 		data, err := ioutil.ReadFile(c.inputFilePath)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
@@ -134,6 +136,7 @@ func TestEditEntry(t *testing.T) {
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
+		helper.LoadFixture(t, "testdata/tokens.yml")
 
 		element, err := NewEntryElement(c.inputData)
 		if err != nil {
@@ -175,6 +178,7 @@ func TestDelete(t *testing.T) {
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
+		helper.LoadFixture(t, "testdata/tokens.yml")
 
 		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
 		err := interactor.Delete(c.input, c.token)
