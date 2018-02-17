@@ -1,0 +1,39 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: golang:alpine
+        environment:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+      - image: takashabe/lumber-db
+        environment:
+          MYSQL_RANDOM_ROOT_PASSWORD: true
+          MYSQL_USER: root
+
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.0
+
+      - run:
+          name: Wait for db startup
+          command: |
+            ./dockerize -wait tcp://localhost:3306 -timeout 1m
+            ./dockerize -wait tcp://localhost:6379 -timeout 1m
+
+      - run:
+          name: Install dependencies
+          command: |
+            go get -u github.com/golang/dep/cmd/dep
+            make deps
+
+      - run:
+          name: Run unit test
+          command: make test
