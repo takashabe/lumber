@@ -3,13 +3,7 @@ jobs:
   build:
     docker:
       - image: golang:alpine
-        environment:
-          DB_HOST: 127.0.0.1
-          DB_USER: root
-      - image: takashabe/lumber-db
-        environment:
-          MYSQL_RANDOM_ROOT_PASSWORD: true
-          MYSQL_USER: root
+      - image: takashabe/lumber-db-dev
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
 
