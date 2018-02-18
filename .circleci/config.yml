@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: golang:alpine
+      - image: takashabe/lumber-app
       - image: takashabe/lumber-db-dev:2018-02-18-001714
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
