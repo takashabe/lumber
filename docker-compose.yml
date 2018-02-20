@@ -1,6 +1,11 @@
 version: "2"
 
 services:
+  lumber:
+    image: takashabe/lumber-app
+    depends_on:
+      - mysql
+    working_dir: /go/src/github.com/takashabe/lumber
   mysql:
     image: takashabe/lumber-db-dev:2018-02-12-005321
     ports:
