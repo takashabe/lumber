@@ -4,6 +4,7 @@ jobs:
     docker:
       - image: takashabe/lumber-app
       - image: takashabe/lumber-db-dev:2018-02-18-001714
+      - image: takashabe/lumber-web
 
     working_directory: /go/src/github.com/takashabe/lumber
 
