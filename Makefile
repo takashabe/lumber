@@ -1,6 +1,15 @@
 SUBPACKAGES := $(shell go list ./...)
+APP_MAIN    := cmd/lumber/lumber.go
 
 .DEFAULT_GOAL := help
+
+##### Operation
+
+build: $(APP_MAIN) ## Build application
+	go build -a $(APP_MAIN)
+
+run: $(APP_MAIN)
+	go run $(APP_MAIN)
 
 ##### Development
 
