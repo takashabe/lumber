@@ -96,6 +96,14 @@ func (s *Server) Routes() *router.Router {
 	r.Get("/api/token/:id", s.Token.Get)
 	r.Get("/api/token/value/:value", s.Token.FindByValue)
 
+	// Routing of the frontend
+	// TODO(takashabe): Want to proxy SPA traffic using a web server.
+	r.ServeFile("/", "./public/index.html")
+	r.ServeFile("/bundle.js", "./public/bundle.js")
+	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		http.ServeFile(w, req, "./public/index.html")
+	})
+
 	return r
 }
 
