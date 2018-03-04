@@ -98,10 +98,11 @@ func (s *Server) Routes() *router.Router {
 
 	// Routing of the frontend
 	// TODO(takashabe): Want to proxy SPA traffic using a web server.
-	r.ServeFile("/", "./public/index.html")
-	r.ServeFile("/bundle.js", "./public/bundle.js")
+	webRoot := fmt.Sprintf("%s/src/github.com/takashabe/lumber-web/public/", os.Getenv("GOPATH"))
+	r.ServeFile("/", fmt.Sprintf("%s/index.html", webRoot))
+	r.ServeFile("/bundle.js", fmt.Sprintf("%s/bundle.js", webRoot))
 	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		http.ServeFile(w, req, "./public/index.html")
+		http.ServeFile(w, req, fmt.Sprintf("%s/index.html", webRoot))
 	})
 
 	return r
