@@ -93,8 +93,8 @@ func (s *Server) Routes() *router.Router {
 	r.Delete("/api/entry/:id", s.Entry.Delete)
 
 	// For tokens
-	r.Get("/api/token/:id", s.Token.Get)
-	r.Get("/api/token/value/:value", s.Token.FindByValue)
+	// expect generate/get tokens, accesses from CLI on the server
+	// TODO(takashabe): Want token API to public with authenticate
 
 	// Routing of the frontend
 	// TODO(takashabe): Want to proxy SPA traffic using a web server.
