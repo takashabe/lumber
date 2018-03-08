@@ -57,6 +57,11 @@ func (i *EntryInteractor) Get(id int) (*domain.Entry, error) {
 	return i.entryRepo.Get(id)
 }
 
+// GetIDs returns entry ids
+func (i *EntryInteractor) GetIDs() ([]int, error) {
+	return i.entryRepo.GetIDs()
+}
+
 // Post saves the posted data in the background datastore
 func (i *EntryInteractor) Post(e *EntryElement, token string) (int, error) {
 	if err := authenticateByToken(i.tokenRepo, token); err != nil {

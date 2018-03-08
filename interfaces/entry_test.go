@@ -32,6 +32,27 @@ func TestGetEntry(t *testing.T) {
 	}
 }
 
+func TestGetIDsEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	cases := []struct {
+		fixture string
+		expect  int
+	}{
+		{"testdata/entries.yml", http.StatusOK},
+	}
+	for i, c := range cases {
+		helper.LoadFixture(t, c.fixture)
+		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/list", ts.URL), nil)
+		defer res.Body.Close()
+
+		if res.StatusCode != c.expect {
+			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		}
+	}
+}
+
 func TestPostEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()

@@ -3,6 +3,7 @@ package application
 import (
 	"database/sql"
 	"io/ioutil"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -89,6 +90,30 @@ func TestGetEntry(t *testing.T) {
 
 		if act.ID != c.expectID {
 			t.Fatalf("#%d: want %d, got %d", i, c.expectID, act.ID)
+		}
+	}
+}
+
+func TestGetIDsEntry(t *testing.T) {
+	cases := []struct {
+		fixture   string
+		expectIDs []int
+	}{
+		{
+			"testdata/entries.yml",
+			[]int{1, 2},
+		},
+	}
+	for i, c := range cases {
+		helper.LoadFixture(t, c.fixture)
+
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		act, err := interactor.GetIDs()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(act, c.expectIDs) {
+			t.Fatalf("#%d: want %d, got %d", i, c.expectIDs, act)
 		}
 	}
 }

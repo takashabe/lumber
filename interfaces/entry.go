@@ -32,6 +32,16 @@ func (h *EntryHandler) Get(w http.ResponseWriter, r *http.Request, id int) {
 	JSON(w, http.StatusOK, entry)
 }
 
+// GetIDs returns entry id list
+func (h *EntryHandler) GetIDs(w http.ResponseWriter, r *http.Request) {
+	ids, err := h.interactor.GetIDs()
+	if err != nil {
+		Error(w, http.StatusNotFound, err, "failed to get entry")
+		return
+	}
+	JSON(w, http.StatusOK, ids)
+}
+
 // Post create new entry
 func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 	token := getToken(r)

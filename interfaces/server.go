@@ -89,6 +89,7 @@ func (s *Server) Routes() *router.Router {
 	// For entries
 	r.Post("/api/entry/", s.Entry.Post)
 	r.Get("/api/entry/:id", s.Entry.Get)
+	r.Get("/api/entry/list", s.Entry.GetIDs)
 	r.Put("/api/entry/:id", s.Entry.Edit)
 	r.Delete("/api/entry/:id", s.Entry.Delete)
 
