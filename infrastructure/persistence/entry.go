@@ -41,6 +41,24 @@ func (r *EntryRepositoryImpl) Get(id int) (*domain.Entry, error) {
 	return r.mapToEntity(row)
 }
 
+// GetIDs return all entry id list
+func (r *EntryRepositoryImpl) GetIDs() ([]int, error) {
+	rows, err := r.query("select id from entries")
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]int, 0)
+	for rows.Next() {
+		var i int
+		err := rows.Scan(&i)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, i)
+	}
+	return ids, nil
+}
+
 // Save saves entry data to datastore
 func (r *EntryRepositoryImpl) Save(e *domain.Entry) (int, error) {
 	sizeTitle := len(e.Title)

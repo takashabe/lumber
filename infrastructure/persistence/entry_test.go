@@ -3,6 +3,7 @@ package persistence
 import (
 	"bytes"
 	"database/sql"
+	"reflect"
 	"testing"
 
 	"github.com/takashabe/lumber/config"
@@ -33,6 +34,41 @@ func TestGetEntry(t *testing.T) {
 
 		if model.ID != c.expectID {
 			t.Errorf("#%d: want id %d, got %d", i, c.expectID, model.ID)
+		}
+	}
+}
+
+func TestGetIDsEntry(t *testing.T) {
+	db, err := NewEntryRepository()
+	if err != nil {
+		t.Fatalf("want non error, got %#v", err)
+	}
+
+	cases := []struct {
+		prepare   func()
+		expectIDs []int
+	}{
+		{
+			func() {
+				helper.LoadFixture(t, "testdata/entries.yml")
+			},
+			[]int{1, 2},
+		},
+		{
+			func() {
+				helper.LoadFixtureSQL(t, "testdata/delete_entries.sql")
+			},
+			[]int{},
+		},
+	}
+	for i, c := range cases {
+		c.prepare()
+		ids, err := db.GetIDs()
+		if err != nil {
+			t.Errorf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(ids, c.expectIDs) {
+			t.Errorf("#%d: want ids %#v, got %#v", i, c.expectIDs, ids)
 		}
 	}
 }

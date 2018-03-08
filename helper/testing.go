@@ -28,6 +28,24 @@ func LoadFixture(t *testing.T, file string) {
 	}
 }
 
+// LoadFixtureSQL load sql fixture files
+func LoadFixtureSQL(t *testing.T, file string) {
+	db, err := newDatastore()
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+	defer db.Close()
+
+	f, err := fixture.NewFixture(db, "mysql")
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+	err = f.LoadSQL(file)
+	if err != nil {
+		t.Fatalf("want non error, got %v", err)
+	}
+}
+
 // SetupTables initialize the database by fixture of the schema
 func SetupTables() {
 	db, err := newDatastore()
