@@ -44,7 +44,7 @@ func TestGetIDsEntry(t *testing.T) {
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, c.fixture)
-		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/list", ts.URL), nil)
+		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entries", ts.URL), nil)
 		defer res.Body.Close()
 
 		if res.StatusCode != c.expect {
