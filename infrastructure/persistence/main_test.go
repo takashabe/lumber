@@ -24,7 +24,7 @@ func setup() {
 	if err != nil {
 		panic(err)
 	}
-	err = f.LoadSQL("testdata/schema.sql")
+	err = f.Load("testdata/schema.sql")
 	if err != nil {
 		panic(err)
 	}

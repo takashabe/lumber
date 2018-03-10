@@ -38,7 +38,7 @@
     ".",
     "mysql"
   ]
-  revision = "5392a35a25fcdc7e3ef2899859c9273e05600330"
+  revision = "3590f2a91aef300646f157eaaf60e326c4a9ebd8"
 
 [[projects]]
   branch = "master"
@@ -47,10 +47,10 @@
   revision = "1eefa4c80f5545ca8e35c9dc96067ec42e6d1f2b"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "d670f9405373e636a5a2765eea47fac0c9bc91a4"
+  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
+  version = "v2.1.1"
 
 [solve-meta]
   analyzer-name = "dep"

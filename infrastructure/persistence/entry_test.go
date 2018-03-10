@@ -45,24 +45,20 @@ func TestGetIDsEntry(t *testing.T) {
 	}
 
 	cases := []struct {
-		prepare   func()
+		fixture   string
 		expectIDs []int
 	}{
 		{
-			func() {
-				helper.LoadFixture(t, "testdata/entries.yml")
-			},
+			"testdata/entries.yml",
 			[]int{1, 2},
 		},
 		{
-			func() {
-				helper.LoadFixtureSQL(t, "testdata/delete_entries.sql")
-			},
+			"testdata/delete_entries.sql",
 			[]int{},
 		},
 	}
 	for i, c := range cases {
-		c.prepare()
+		helper.LoadFixture(t, c.fixture)
 		ids, err := db.GetIDs()
 		if err != nil {
 			t.Errorf("#%d: want non error, got %#v", i, err)

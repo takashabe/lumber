@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/k0kubun/pp"
 	"github.com/pkg/errors"
 )
 
@@ -57,7 +56,6 @@ func (c *CLI) Run(args []string) int {
 	if param.token != "" {
 		os.Setenv(LumberToken, param.token)
 	}
-	pp.Println(param)
 	c.client, err = New()
 	if err != nil {
 		fmt.Fprintf(c.ErrStream, "failed to initialized client: %v\n", err)
