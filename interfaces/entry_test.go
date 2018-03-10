@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/takashabe/lumber/helper"
@@ -37,18 +39,27 @@ func TestGetIDsEntry(t *testing.T) {
 	defer ts.Close()
 
 	cases := []struct {
-		fixture string
-		expect  int
+		fixture    string
+		expectBody []byte
+		expectCode int
 	}{
-		{"testdata/entries.yml", http.StatusOK},
+		{"testdata/entries.yml", []byte(`{"ids":[1,2]}`), http.StatusOK},
+		{"testdata/truncate_entries.sql", []byte(`{"ids":[]}`), http.StatusOK},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, c.fixture)
 		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entries", ts.URL), nil)
 		defer res.Body.Close()
 
-		if res.StatusCode != c.expect {
-			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		if res.StatusCode != c.expectCode {
+			t.Errorf("#%d: want %d, got %d", i, c.expectCode, res.StatusCode)
+		}
+		act, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(act, c.expectBody) {
+			t.Errorf("#%d: want %s, got %s", i, c.expectBody, act)
 		}
 	}
 }

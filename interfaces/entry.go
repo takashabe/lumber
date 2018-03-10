@@ -39,7 +39,11 @@ func (h *EntryHandler) GetIDs(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
 	}
-	JSON(w, http.StatusOK, ids)
+
+	type response struct {
+		IDs []int `json:"ids"`
+	}
+	JSON(w, http.StatusOK, response{IDs: ids})
 }
 
 // Post create new entry
