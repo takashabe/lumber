@@ -69,6 +69,63 @@ func TestGetIDsEntry(t *testing.T) {
 	}
 }
 
+func TestGetTitlesEntry(t *testing.T) {
+	db, err := NewEntryRepository()
+	if err != nil {
+		t.Fatalf("want non error, got %#v", err)
+	}
+
+	cases := []struct {
+		fixture string
+		start   int
+		length  int
+		expect  []*domain.Entry
+	}{
+		{
+			"testdata/entries.yml",
+			0,
+			2,
+			[]*domain.Entry{
+				&domain.Entry{ID: 1, Title: "foo"},
+				&domain.Entry{ID: 2, Title: "foo"},
+			},
+		},
+		{
+			"testdata/entries.yml",
+			2,
+			2,
+			[]*domain.Entry{
+				&domain.Entry{ID: 2, Title: "foo"},
+			},
+		},
+		{
+			"testdata/entries.yml",
+			0,
+			0,
+			[]*domain.Entry{
+				&domain.Entry{ID: 1, Title: "foo"},
+				&domain.Entry{ID: 2, Title: "foo"},
+			},
+		},
+		{
+			"testdata/delete_entries.sql",
+			0,
+			2,
+			[]*domain.Entry{},
+		},
+	}
+	for i, c := range cases {
+		helper.LoadFixture(t, c.fixture)
+		es, err := db.GetTitles(c.start, c.length)
+		if err != nil {
+			t.Errorf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(es, c.expect) {
+			t.Errorf("#%d: want %q, got %q", i, c.expect, es)
+		}
+	}
+}
+
 func TestSaveEntry(t *testing.T) {
 	db, err := NewEntryRepository()
 	if err != nil {

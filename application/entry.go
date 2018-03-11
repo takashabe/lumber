@@ -62,6 +62,11 @@ func (i *EntryInteractor) GetIDs() ([]int, error) {
 	return i.entryRepo.GetIDs()
 }
 
+// GetTitles returns entries with contain id and title
+func (i *EntryInteractor) GetTitles(start, n int) ([]*domain.Entry, error) {
+	return i.entryRepo.GetTitles(start, n)
+}
+
 // Post saves the posted data in the background datastore
 func (i *EntryInteractor) Post(e *EntryElement, token string) (int, error) {
 	if err := authenticateByToken(i.tokenRepo, token); err != nil {

@@ -46,6 +46,28 @@ func (h *EntryHandler) GetIDs(w http.ResponseWriter, r *http.Request) {
 	JSON(w, http.StatusOK, response{IDs: ids})
 }
 
+// GetTitles returns entries
+func (h *EntryHandler) GetTitles(w http.ResponseWriter, r *http.Request, start, length int) {
+	es, err := h.interactor.GetTitles(start, length)
+	if err != nil {
+		Error(w, http.StatusNotFound, err, "failed to get entry")
+		return
+	}
+
+	type entry struct {
+		ID    int    `json:"id"`
+		Title string `json:"title"`
+	}
+	type response struct {
+		Data []entry `json:"data"`
+	}
+	res := []entry{}
+	for _, e := range es {
+		res = append(res, entry{ID: e.ID, Title: e.Title})
+	}
+	JSON(w, http.StatusOK, response{Data: res})
+}
+
 // Post create new entry
 func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 	token := getToken(r)

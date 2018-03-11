@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/takashabe/lumber/config"
 	"github.com/takashabe/lumber/domain"
@@ -57,6 +58,33 @@ func (r *EntryRepositoryImpl) GetIDs() ([]int, error) {
 		ids = append(ids, i)
 	}
 	return ids, nil
+}
+
+// GetTitles returns entries with contain id and title
+func (r *EntryRepositoryImpl) GetTitles(start, n int) ([]*domain.Entry, error) {
+	if start < 0 {
+		return nil, errors.New("invalid start index")
+	}
+	if n < 1 {
+		// default
+		n = 100
+	}
+
+	// NOTE: depends on id order
+	rows, err := r.query("select id, title from entries where id >= ? limit ?", start, n)
+	if err != nil {
+		return nil, err
+	}
+	entries := make([]*domain.Entry, 0)
+	for rows.Next() {
+		e := &domain.Entry{}
+		err := rows.Scan(&e.ID, &e.Title)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, e)
+	}
+	return entries, nil
 }
 
 // Save saves entry data to datastore

@@ -64,6 +64,43 @@ func TestGetIDsEntry(t *testing.T) {
 	}
 }
 
+func TestGetTitlesEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+
+	cases := []struct {
+		fixture    string
+		start      int
+		length     int
+		expectBody []byte
+		expectCode int
+	}{
+		{
+			"testdata/entries.yml",
+			0,
+			2,
+			[]byte(`{"data":[{"id":1,"title":"foo"},{"id":2,"title":"foo"}]}`),
+			http.StatusOK,
+		},
+	}
+	for i, c := range cases {
+		helper.LoadFixture(t, c.fixture)
+		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/titles/%d/%d", ts.URL, c.start, c.length), nil)
+		defer res.Body.Close()
+
+		if res.StatusCode != c.expectCode {
+			t.Errorf("#%d: want %d, got %d", i, c.expectCode, res.StatusCode)
+		}
+		act, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(act, c.expectBody) {
+			t.Errorf("#%d: want %s, got %s", i, c.expectBody, act)
+		}
+	}
+}
+
 func TestPostEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()

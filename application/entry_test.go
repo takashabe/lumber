@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/takashabe/lumber/config"
+	"github.com/takashabe/lumber/domain"
 	"github.com/takashabe/lumber/helper"
 )
 
@@ -114,6 +115,37 @@ func TestGetIDsEntry(t *testing.T) {
 		}
 		if !reflect.DeepEqual(act, c.expectIDs) {
 			t.Fatalf("#%d: want %d, got %d", i, c.expectIDs, act)
+		}
+	}
+}
+
+func TestGetTitlesEntry(t *testing.T) {
+	cases := []struct {
+		fixture string
+		start   int
+		length  int
+		expect  []*domain.Entry
+	}{
+		{
+			"testdata/entries.yml",
+			0,
+			2,
+			[]*domain.Entry{
+				&domain.Entry{ID: 1, Title: "foo"},
+				&domain.Entry{ID: 2, Title: "foo"},
+			},
+		},
+	}
+	for i, c := range cases {
+		helper.LoadFixture(t, c.fixture)
+
+		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		act, err := interactor.GetTitles(c.start, c.length)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(act, c.expect) {
+			t.Fatalf("#%d: want %q, got %q", i, c.expect, act)
 		}
 	}
 }
