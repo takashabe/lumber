@@ -17,19 +17,35 @@ func TestGetEntry(t *testing.T) {
 	defer ts.Close()
 
 	cases := []struct {
-		input  int
-		expect int
+		input      int
+		expectBody []byte
+		expectCode int
 	}{
-		{1, http.StatusOK},
-		{0, http.StatusNotFound},
+		{
+			1,
+			[]byte(`{"id":1,"title":"foo","content":"bar","status":1}`),
+			http.StatusOK,
+		},
+		{
+			0,
+			[]byte(`{"reason":"failed to get entry"}`),
+			http.StatusNotFound,
+		},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 		res := sendRequest(t, "GET", fmt.Sprintf("%s/api/entry/%d", ts.URL, c.input), nil)
 		defer res.Body.Close()
 
-		if res.StatusCode != c.expect {
-			t.Errorf("#%d: want %d, got %d", i, c.expect, res.StatusCode)
+		if res.StatusCode != c.expectCode {
+			t.Errorf("#%d: want %d, got %d", i, c.expectCode, res.StatusCode)
+		}
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %v", i, err)
+		}
+		if !reflect.DeepEqual(body, c.expectBody) {
+			t.Errorf("#%d: want body %q, got %q", i, c.expectBody, body)
 		}
 	}
 }
