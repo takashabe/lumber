@@ -2,10 +2,10 @@ package domain
 
 // Entry represent the entry entity
 type Entry struct {
-	ID      int
-	Title   string
-	Content string
-	Status  EntryStatus
+	ID      int         `json:"id"`
+	Title   string      `json:"title"`
+	Content string      `json:"content"`
+	Status  EntryStatus `json:"status"`
 }
 
 // EntryStatus represent status of the entries
