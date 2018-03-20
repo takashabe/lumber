@@ -81,7 +81,9 @@ func (c *Client) CreateEntry(ctx context.Context, file string) (int, error) {
 	defer res.Body.Close()
 	err = verifyHTTPStatusCode(http.StatusOK, res)
 	if err != nil {
-		return 0, err
+		// TODO: error handling
+		b, _ := ioutil.ReadAll(res.Body)
+		return 0, errors.Wrapf(err, "response: %s", b)
 	}
 
 	type response struct {
@@ -107,7 +109,7 @@ func (c *Client) Entry(id int) *Entry {
 
 func verifyHTTPStatusCode(expect int, res *http.Response) error {
 	if c := res.StatusCode; c != expect {
-		return errors.Errorf("HTTP response error: expecte status code %d, but received %d", expect, c)
+		return errors.Errorf("HTTP response error: expect status code %d, but received %d", expect, c)
 	}
 	return nil
 }
