@@ -5,7 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -30,6 +32,7 @@ const (
 type param struct {
 	addr  string
 	file  string
+	dir   string
 	token string
 }
 
@@ -81,7 +84,8 @@ func (c *CLI) parseArgs(args []string, p *param) error {
 	flags.SetOutput(c.ErrStream)
 
 	flags.StringVar(&p.addr, "addr", defaultAddr, "Lumber server address.")
-	flags.StringVar(&p.file, "file", "", "Post entry file")
+	flags.StringVar(&p.file, "file", "", "Post an entry file")
+	flags.StringVar(&p.dir, "dir", "", "Post an entries in the directory")
 	flags.StringVar(&p.token, "token", "", "Server token")
 
 	err := flags.Parse(args)
@@ -104,6 +108,11 @@ func (c *CLI) commands() []command {
 			"post entry",
 			c.doPostEntry,
 		},
+		{
+			"post-dir",
+			"post an entries in the directory",
+			c.doPostEntryWithDir,
+		},
 	}
 }
 
@@ -113,5 +122,33 @@ func (c *CLI) doPostEntry(ctx context.Context, p *param) error {
 		return errors.Wrap(err, "failed post entry")
 	}
 	fmt.Fprintf(c.OutStream, "succeed post entry. id=%d\n", id)
+	return nil
+}
+
+func (c *CLI) doPostEntryWithDir(ctx context.Context, p *param) error {
+	fs, err := ioutil.ReadDir(p.dir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read directory")
+	}
+
+	// TODO(takashabe): invoke goroutine
+	max := len(fs)
+	ids := []int{}
+	for i, f := range fs {
+		fmt.Printf("%d/%d ...\n", i+1, max)
+		// ignore recursive directory
+		if f.IsDir() {
+			continue
+		}
+
+		path := filepath.Join(p.dir, f.Name())
+		fmt.Printf("creating: %s\n", path)
+		id, err := c.client.CreateEntry(ctx, path)
+		if err != nil {
+			return err
+		}
+		ids = append(ids, id)
+	}
+	fmt.Printf("Finish! Generated entry ids: %v", ids)
 	return nil
 }
