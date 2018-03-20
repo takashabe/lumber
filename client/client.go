@@ -15,8 +15,8 @@ import (
 
 // Constants related to environment variables
 const (
-	LumberServerAddress = "lumber_server_address"
-	LumberToken         = "lumber_session_token"
+	LumberServerAddress = "LUMBER_SERVER_ADDRESS"
+	LumberToken         = "LUMBER_SESSION_TOKEN"
 )
 
 // Client represent a client for the lumber server
