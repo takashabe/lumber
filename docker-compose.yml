@@ -2,6 +2,6 @@ version: "2"
 
 services:
   mysql:
-    image: takashabe/lumber-db-dev:2018-02-12-005321
+    image: takashabe/lumber-db-dev:2018-02-18-001714
     ports:
       - "3306:3306"
