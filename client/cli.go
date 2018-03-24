@@ -126,29 +126,34 @@ func (c *CLI) doPostEntry(ctx context.Context, p *param) error {
 }
 
 func (c *CLI) doPostEntryWithDir(ctx context.Context, p *param) error {
+	f, err := os.Stat(p.dir)
+	if err != nil {
+		return err
+	}
+	if !f.IsDir() {
+		return errors.Errorf("invalid args: %s doesn't directory", p.dir)
+	}
+	return c.postEntryRecursiveDir(ctx, p)
+}
+
+func (c *CLI) postEntryRecursiveDir(ctx context.Context, p *param) error {
 	fs, err := ioutil.ReadDir(p.dir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read directory")
 	}
 
-	// TODO(takashabe): invoke goroutine
-	max := len(fs)
 	ids := []int{}
-	for i, f := range fs {
-		fmt.Printf("%d/%d ...\n", i+1, max)
-		// ignore recursive directory
+	for _, f := range fs {
 		if f.IsDir() {
-			continue
+			c.postEntryRecursiveDir(ctx, p)
 		}
 
 		path := filepath.Join(p.dir, f.Name())
-		fmt.Printf("creating: %s\n", path)
 		id, err := c.client.CreateEntry(ctx, path)
 		if err != nil {
 			return err
 		}
 		ids = append(ids, id)
 	}
-	fmt.Printf("Finish! Generated entry ids: %v", ids)
 	return nil
 }
