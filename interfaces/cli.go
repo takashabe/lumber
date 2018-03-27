@@ -11,7 +11,7 @@ import (
 
 // default parameters
 const (
-	defaultPort = 8080
+	defaultPort = 80
 )
 
 // Exit codes. used only in Run()
