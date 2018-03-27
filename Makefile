@@ -8,8 +8,15 @@ APP_MAIN    := cmd/lumber/lumber.go
 build: $(APP_MAIN) ## Build application
 	go build -a $(APP_MAIN)
 
-run: $(APP_MAIN)
+run: $(APP_MAIN) ## Run application
 	go run $(APP_MAIN)
+
+docker-build: $(APP_MAIN) ## Build Docker image
+	GOOS=linux GOARCH=amd64 go build -o release/lumber $(APP_MAIN)
+	docker build -t "takashabe/lumber-api:prd" .
+
+docker-push:  ## Push docker image to docker.io
+	docker push "takashabe/lumber-api:prd"
 
 ##### Development
 

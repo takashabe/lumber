@@ -12,3 +12,6 @@
 
 # Package management tools
 vendor/
+
+# binary
+release/
