@@ -2,3 +2,6 @@ db:
   name: lumber
   user: root
   port: 3306
+
+server:
+  port: 8080
