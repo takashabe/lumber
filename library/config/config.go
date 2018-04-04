@@ -24,8 +24,13 @@ var Config = struct {
 
 func init() {
 	conf := os.Getenv("APP_CONF")
-	err := configor.Load(&Config, conf)
-	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+	if len(conf) != 0 {
+		err := configor.Load(&Config, conf)
+		if err != nil {
+			log.Fatalf("failed to load config: %v", err)
+		}
+		return
 	}
+
+	configor.Load(&Config)
 }
