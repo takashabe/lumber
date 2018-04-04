@@ -1,0 +1,4 @@
+db:
+  name: lumber
+  user: root
+  port: 3306

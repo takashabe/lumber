@@ -2,10 +2,22 @@
 
 
 [[projects]]
+  name = "github.com/BurntSushi/toml"
+  packages = ["."]
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
+
+[[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   revision = "a0583e0143b1624142adab07e0e97fe106d99561"
   version = "v1.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/configor"
+  packages = ["."]
+  revision = "ec34f328956f53dfbd06e9f5306e37e6943443c3"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -49,12 +61,12 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2c994a0ae5b32be0a84fad171e7735882a2323c083542c54c5ebfa3f5e84f761"
+  inputs-digest = "f0903cfb6cacb32a1fe60366eee61bb7a751f25cb81193be8c5f2437220f57ca"
   solver-name = "gps-cdcl"
   solver-version = 1

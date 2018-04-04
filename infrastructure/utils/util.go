@@ -3,25 +3,22 @@ package utils
 import (
 	"database/sql"
 	"fmt"
-	"os"
-)
 
-func getEnvWithDefault(name, def string) string {
-	if env := os.Getenv(name); len(env) != 0 {
-		return env
-	}
-	return def
-}
+	"github.com/takashabe/lumber/library/config"
+)
 
 // ConnectMySQL returns sql.DB for mysql
 func ConnectMySQL() (*sql.DB, error) {
+	conf := config.Config.DB
+
 	var (
-		user     = getEnvWithDefault("DB_USER", "root")
-		password = getEnvWithDefault("DB_PASSWORD", "")
-		host     = getEnvWithDefault("DB_HOST", "localhost")
-		port     = getEnvWithDefault("DB_PORT", "3306")
+		name     = conf.Name
+		user     = conf.User
+		password = conf.Password
+		host     = conf.Host
+		port     = conf.Port
 	)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/lumber?parseTime=true", user, password, host, port)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", user, password, host, port, name)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
