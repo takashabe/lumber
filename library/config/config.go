@@ -10,15 +10,15 @@ import (
 // Config represent configuration
 var Config = struct {
 	DB struct {
-		Name     string `env:"DB_NAME"`
-		Host     string `env:"DB_HOST"`
-		User     string `env:"DB_USER"`
-		Password string `env:"DB_PASSWORD"`
-		Port     int    `env:"DB_PORT"`
+		Name     string `env:"LUMBER_DB_NAME"`
+		Host     string `env:"LUMBER_DB_HOST"`
+		User     string `env:"LUMBER_DB_USER"`
+		Password string `env:"LUMBER_DB_PASSWORD"`
+		Port     int    `env:"LUMBER_DB_PORT"`
 	}
 
 	Server struct {
-		Port int `default:"8080"`
+		Port int `default:"8080" env:"LUMBER_SERVER_PORT"`
 	}
 }{}
 
