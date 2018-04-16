@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -72,9 +73,8 @@ func (h *EntryHandler) GetTitles(w http.ResponseWriter, r *http.Request, start, 
 
 // Post create new entry
 func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
@@ -110,9 +110,8 @@ func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 
 // Edit change entry the title and content
 func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
@@ -147,9 +146,8 @@ func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
 
 // Delete deletes entry
 func (h *EntryHandler) Delete(w http.ResponseWriter, r *http.Request, id int) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
@@ -167,6 +165,10 @@ func (h *EntryHandler) Delete(w http.ResponseWriter, r *http.Request, id int) {
 	JSON(w, http.StatusOK, nil)
 }
 
-func getToken(r *http.Request) string {
-	return r.URL.Query().Get("token")
+func (h *EntryHandler) authenticate(r *http.Request) error {
+	token := r.URL.Query().Get("token")
+	if len(token) == 0 {
+		return errors.New("invalid parmaeter")
+	}
+	return h.auth.AuthenticateByToken(token)
 }

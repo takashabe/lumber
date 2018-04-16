@@ -151,8 +151,16 @@ func TestPostEntry(t *testing.T) {
 				Data:   []byte("# title\n\n## content"),
 				Status: 1,
 			},
+			"notfound",
+			http.StatusUnauthorized,
+		},
+		{
+			postPayload{
+				Data:   []byte("# title\n\n## content"),
+				Status: 1,
+			},
 			"",
-			http.StatusBadRequest,
+			http.StatusUnauthorized,
 		},
 	}
 	for i, c := range cases {
@@ -213,7 +221,7 @@ func TestEditEntry(t *testing.T) {
 				Data: []byte("# title\n\n## content"),
 			},
 			"",
-			http.StatusBadRequest,
+			http.StatusUnauthorized,
 		},
 	}
 	for i, c := range cases {
@@ -243,7 +251,7 @@ func TestDeleteEntry(t *testing.T) {
 	}{
 		{1, "foo", http.StatusOK},
 		{0, "foo", http.StatusNotFound},
-		{1, "", http.StatusBadRequest},
+		{1, "", http.StatusUnauthorized},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
