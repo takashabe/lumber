@@ -80,7 +80,7 @@ func TestGetEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
 
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		interactor := NewEntryInteractor(getEntryRepository(t))
 		act, err := interactor.Get(c.input)
 		if err != c.expectErr {
 			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectErr, err)
@@ -108,7 +108,7 @@ func TestGetIDsEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, c.fixture)
 
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		interactor := NewEntryInteractor(getEntryRepository(t))
 		act, err := interactor.GetIDs()
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
@@ -139,7 +139,7 @@ func TestGetTitlesEntry(t *testing.T) {
 	for i, c := range cases {
 		helper.LoadFixture(t, c.fixture)
 
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
+		interactor := NewEntryInteractor(getEntryRepository(t))
 		act, err := interactor.GetTitles(c.start, c.length)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
@@ -153,16 +153,12 @@ func TestGetTitlesEntry(t *testing.T) {
 func TestPostEntry(t *testing.T) {
 	cases := []struct {
 		inputFilePath string
-		token         string
 		expectErr     error
 	}{
-		{"testdata/go-pubsub_readme.md", "foo", nil},
-		{"testdata/minimum.md", "foo", nil},
-		{"testdata/minimum.md", "", config.ErrInsufficientPrivileges},
+		{"testdata/go-pubsub_readme.md", nil},
+		{"testdata/minimum.md", nil},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "testdata/tokens.yml")
-
 		data, err := ioutil.ReadFile(c.inputFilePath)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
@@ -171,8 +167,8 @@ func TestPostEntry(t *testing.T) {
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
-		_, err = interactor.Post(element, c.token)
+		interactor := NewEntryInteractor(getEntryRepository(t))
+		_, err = interactor.Post(element)
 		if errors.Cause(err) != c.expectErr {
 			t.Fatalf("#%d: want %#v, got %#v", i, c.expectErr, err)
 		}
@@ -181,36 +177,29 @@ func TestPostEntry(t *testing.T) {
 
 func TestEditEntry(t *testing.T) {
 	cases := []struct {
-		inputID       int
-		inputData     []byte
-		token         string
-		expectEditErr error
-		expectGetErr  error
+		inputID   int
+		inputData []byte
+		err       error
 	}{
-		{1, []byte("# title\n\n## content"), "foo", nil, nil},
-		{0, []byte("# title\n\n## content"), "foo", nil, sql.ErrNoRows},
-		{1, []byte("# title\n\n## content"), "", config.ErrInsufficientPrivileges, nil},
+		{1, []byte("# title\n\n## content"), nil},
+		{0, []byte("# title\n\n## content"), sql.ErrNoRows},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
-		helper.LoadFixture(t, "testdata/tokens.yml")
 
 		element, err := NewEntryElement(c.inputData)
 		if err != nil {
 			t.Fatalf("#%d: want non error, got %#v", i, err)
 		}
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
-		err = interactor.Edit(c.inputID, element, c.token)
-		if errors.Cause(err) != c.expectEditErr {
-			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectEditErr, err)
-		}
+		interactor := NewEntryInteractor(getEntryRepository(t))
+		err = interactor.Edit(c.inputID, element)
 		if err != nil {
 			continue
 		}
 
 		entry, err := interactor.Get(c.inputID)
-		if errors.Cause(err) != c.expectGetErr {
-			t.Fatalf("#%d: want error %#v, got %#v", i, c.expectGetErr, err)
+		if errors.Cause(err) != c.err {
+			t.Fatalf("#%d: want error %#v, got %#v", i, c.err, err)
 		}
 		if err != nil {
 			continue
@@ -226,19 +215,16 @@ func TestEditEntry(t *testing.T) {
 func TestDelete(t *testing.T) {
 	cases := []struct {
 		input     int
-		token     string
 		expectErr error
 	}{
-		{1, "foo", nil},
-		{0, "foo", nil},
-		{1, "", config.ErrInsufficientPrivileges},
+		{1, nil},
+		{0, nil},
 	}
 	for i, c := range cases {
 		helper.LoadFixture(t, "testdata/entries.yml")
-		helper.LoadFixture(t, "testdata/tokens.yml")
 
-		interactor := NewEntryInteractor(getEntryRepository(t), getTokenRepository(t))
-		err := interactor.Delete(c.input, c.token)
+		interactor := NewEntryInteractor(getEntryRepository(t))
+		err := interactor.Delete(c.input)
 		if errors.Cause(err) != c.expectErr {
 			t.Fatalf("#%d: want %#v, got %#v", i, c.expectErr, err)
 		}

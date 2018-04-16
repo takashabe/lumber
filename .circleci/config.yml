@@ -2,7 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      - image: takashabe/lumber-app
+      - image: takashabe/lumber-golang:latest
+        environment:
+          LUMBER_DB_NAME: "lumber"
+          LUMBER_DB_HOST: "127.0.0.1"
+          LUMBER_DB_USER: "root"
+          LUMBER_DB_PASSWORD: ""
+          LUMBER_DB_PORT: 3306
       - image: takashabe/lumber-db-dev:2018-02-18-001714
 
     working_directory: /go/src/github.com/takashabe/lumber
@@ -24,9 +30,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            go get -u github.com/golang/dep/cmd/dep
             make deps
 
       - run:
           name: Run unit test
-          command: make test
+          command: |
+            make test

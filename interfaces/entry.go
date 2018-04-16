@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -12,19 +13,21 @@ import (
 
 // EntryHandler provides handler for the entry
 type EntryHandler struct {
-	interactor *application.EntryInteractor
+	entry *application.EntryInteractor
+	auth  *application.AuthInteractor
 }
 
 // NewEntryHandler returns initialized EntryHandler
 func NewEntryHandler(e repository.EntryRepository, t repository.TokenRepository) *EntryHandler {
 	return &EntryHandler{
-		interactor: application.NewEntryInteractor(e, t),
+		entry: application.NewEntryInteractor(e),
+		auth:  application.NewAuthInteractor(t),
 	}
 }
 
 // Get returns entry when matched id
 func (h *EntryHandler) Get(w http.ResponseWriter, r *http.Request, id int) {
-	entry, err := h.interactor.Get(id)
+	entry, err := h.entry.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
@@ -34,7 +37,7 @@ func (h *EntryHandler) Get(w http.ResponseWriter, r *http.Request, id int) {
 
 // GetIDs returns entry id list
 func (h *EntryHandler) GetIDs(w http.ResponseWriter, r *http.Request) {
-	ids, err := h.interactor.GetIDs()
+	ids, err := h.entry.GetIDs()
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
@@ -48,7 +51,7 @@ func (h *EntryHandler) GetIDs(w http.ResponseWriter, r *http.Request) {
 
 // GetTitles returns entries
 func (h *EntryHandler) GetTitles(w http.ResponseWriter, r *http.Request, start, length int) {
-	es, err := h.interactor.GetTitles(start, length)
+	es, err := h.entry.GetTitles(start, length)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to get entry")
 		return
@@ -70,9 +73,8 @@ func (h *EntryHandler) GetTitles(w http.ResponseWriter, r *http.Request, start, 
 
 // Post create new entry
 func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
@@ -92,7 +94,7 @@ func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	element.Status = domain.EntryStatus(raw.Status)
-	id, err := h.interactor.Post(element, token)
+	id, err := h.entry.Post(element)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
@@ -108,13 +110,12 @@ func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 
 // Edit change entry the title and content
 func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
-	entry, err := h.interactor.Get(id)
+	entry, err := h.entry.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
@@ -135,7 +136,7 @@ func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
 		return
 	}
 	element.Status = entry.Status
-	err = h.interactor.Edit(id, element, token)
+	err = h.entry.Edit(id, element)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to edit entry")
 		return
@@ -145,19 +146,18 @@ func (h *EntryHandler) Edit(w http.ResponseWriter, r *http.Request, id int) {
 
 // Delete deletes entry
 func (h *EntryHandler) Delete(w http.ResponseWriter, r *http.Request, id int) {
-	token := getToken(r)
-	if token == "" {
-		Error(w, http.StatusBadRequest, nil, "invalid request parameters")
+	if err := h.authenticate(r); err != nil {
+		Error(w, http.StatusUnauthorized, nil, "failed to authorized")
 		return
 	}
 
-	_, err := h.interactor.Get(id)
+	_, err := h.entry.Get(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, fmt.Sprintf("not found entry. id:%d", id))
 		return
 	}
 
-	err = h.interactor.Delete(id, token)
+	err = h.entry.Delete(id)
 	if err != nil {
 		Error(w, http.StatusNotFound, err, "failed to delete entry")
 		return
@@ -165,6 +165,10 @@ func (h *EntryHandler) Delete(w http.ResponseWriter, r *http.Request, id int) {
 	JSON(w, http.StatusOK, nil)
 }
 
-func getToken(r *http.Request) string {
-	return r.URL.Query().Get("token")
+func (h *EntryHandler) authenticate(r *http.Request) error {
+	token := r.URL.Query().Get("token")
+	if len(token) == 0 {
+		return errors.New("invalid parmaeter")
+	}
+	return h.auth.AuthenticateByToken(token)
 }

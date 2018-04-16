@@ -13,14 +13,12 @@ import (
 // EntryInteractor provides operation for entries
 type EntryInteractor struct {
 	entryRepo repository.EntryRepository
-	tokenRepo repository.TokenRepository
 }
 
 // NewEntryInteractor returns initialized Entry object
-func NewEntryInteractor(e repository.EntryRepository, t repository.TokenRepository) *EntryInteractor {
+func NewEntryInteractor(e repository.EntryRepository) *EntryInteractor {
 	return &EntryInteractor{
 		entryRepo: e,
-		tokenRepo: t,
 	}
 }
 
@@ -68,10 +66,7 @@ func (i *EntryInteractor) GetTitles(start, n int) ([]*domain.Entry, error) {
 }
 
 // Post saves the posted data in the background datastore
-func (i *EntryInteractor) Post(e *EntryElement, token string) (int, error) {
-	if err := authenticateByToken(i.tokenRepo, token); err != nil {
-		return 0, err
-	}
+func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
 	if !e.Status.IsValid() {
 		return 0, errors.Errorf("invalid entry status type: %d", e.Status)
 	}
@@ -79,20 +74,14 @@ func (i *EntryInteractor) Post(e *EntryElement, token string) (int, error) {
 }
 
 // Edit changes entry the title and content
-func (i *EntryInteractor) Edit(id int, e *EntryElement, token string) error {
-	if err := authenticateByToken(i.tokenRepo, token); err != nil {
-		return err
-	}
+func (i *EntryInteractor) Edit(id int, e *EntryElement) error {
 	entity := e.Entity()
 	entity.ID = id
 	return i.entryRepo.Edit(entity)
 }
 
 // Delete deletes entry
-func (i *EntryInteractor) Delete(id int, token string) error {
-	if err := authenticateByToken(i.tokenRepo, token); err != nil {
-		return err
-	}
+func (i *EntryInteractor) Delete(id int) error {
 	_, err := i.entryRepo.Delete(id)
 	return err
 }
