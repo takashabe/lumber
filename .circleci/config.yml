@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: golang:1.10-alpine
+        environment:
+          LUMBER_SERVER_ADDRESS: "http://127.0.0.1:8080"
+          LUMBER_SESSION_TOKEN: "test"
       - image: takashabe/lumber-db-dev:2018-02-18-001714
 
     working_directory: /go/src/github.com/takashabe/lumber
