@@ -20,10 +20,10 @@ func NewAuthInteractor(t repository.TokenRepository) *AuthInteractor {
 
 // AuthenticateByToken provides validate of a token.
 // Returns non-nil error when failed to authenticate.
-func (i *AuthInteractor) AuthenticateByToken(repository repository.TokenRepository, token string) error {
+func (i *AuthInteractor) AuthenticateByToken(token string) error {
 	// TODO: Now process of the authenticate, only compare to exist a token.
 	//       Want to add management of the user and authenticate each by user.
-	_, err := repository.FindByValue(token)
+	_, err := i.tokenRepo.FindByValue(token)
 	if err != nil {
 		return errors.Wrapf(config.ErrInsufficientPrivileges, "error: %#v", err)
 	}
