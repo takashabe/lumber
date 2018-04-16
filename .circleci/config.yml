@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: golang:1.10-alpine
+      # - image: golang:1.10-alpine
+      - image: takashabe/lumber-golang:latest
         environment:
           LUMBER_SERVER_ADDRESS: "http://127.0.0.1:8080"
           LUMBER_SESSION_TOKEN: "test"
