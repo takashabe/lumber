@@ -5,3 +5,7 @@ services:
     image: takashabe/lumber-db-dev:2018-02-18-001714
     ports:
       - "3306:3306"
+  nginx:
+    image: takashabe/lumber-web:2018-04-15-234211
+    ports:
+      - "172.19.248.232:80:80"
