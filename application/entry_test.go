@@ -175,6 +175,48 @@ func TestPostEntry(t *testing.T) {
 	}
 }
 
+func TestPostWithPrivateTitle(t *testing.T) {
+	cases := []struct {
+		inputFilePath string
+		expectEntry   *domain.Entry
+	}{
+		{
+			"testdata/minimum.md",
+			&domain.Entry{
+				Title:   "title",
+				Content: "<p>content</p>",
+				Status:  0,
+			},
+		},
+		{
+			"testdata/wip.md",
+			&domain.Entry{
+				Title:   "[wip] title",
+				Content: "<p>content</p>",
+				Status:  1,
+			},
+		},
+	}
+	for i, c := range cases {
+		data, _ := ioutil.ReadFile(c.inputFilePath)
+		element, _ := NewEntryElement(data)
+		interactor := NewEntryInteractor(getEntryRepository(t))
+		id, err := interactor.Post(element)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+
+		c.expectEntry.ID = id
+		actual, err := interactor.Get(id)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		if !reflect.DeepEqual(actual, c.expectEntry) {
+			t.Errorf("#%d: want %#v, got %#v", i, c.expectEntry, actual)
+		}
+	}
+}
+
 func TestEditEntry(t *testing.T) {
 	cases := []struct {
 		inputID   int

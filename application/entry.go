@@ -70,14 +70,17 @@ func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
 	if !e.Status.IsValid() {
 		return 0, errors.Errorf("invalid entry status type: %d", e.Status)
 	}
-	return i.entryRepo.Save(e.Entity())
+	entry := e.Entity()
+	entry.UpdateStatusByTitle()
+	return i.entryRepo.Save(entry)
 }
 
 // Edit changes entry the title and content
 func (i *EntryInteractor) Edit(id int, e *EntryElement) error {
-	entity := e.Entity()
-	entity.ID = id
-	return i.entryRepo.Edit(entity)
+	entry := e.Entity()
+	entry.ID = id
+	entry.UpdateStatusByTitle()
+	return i.entryRepo.Edit(entry)
 }
 
 // Delete deletes entry
@@ -104,16 +107,6 @@ func NewEntryElement(data []byte) (*EntryElement, error) {
 		Content: content,
 		Status:  domain.EntryStatusPublic,
 	}, nil
-}
-
-// SetPublic set public status
-func (e *EntryElement) SetPublic() {
-	e.Status = domain.EntryStatusPublic
-}
-
-// SetPrivate set private status
-func (e *EntryElement) SetPrivate() {
-	e.Status = domain.EntryStatusPrivate
 }
 
 // Entity returns the entity from creating by the EntryElement
