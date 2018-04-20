@@ -106,16 +106,6 @@ func NewEntryElement(data []byte) (*EntryElement, error) {
 	}, nil
 }
 
-// SetPublic set public status
-func (e *EntryElement) SetPublic() {
-	e.Status = domain.EntryStatusPublic
-}
-
-// SetPrivate set private status
-func (e *EntryElement) SetPrivate() {
-	e.Status = domain.EntryStatusPrivate
-}
-
 // Entity returns the entity from creating by the EntryElement
 func (e *EntryElement) Entity() *domain.Entry {
 	return &domain.Entry{
