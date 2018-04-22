@@ -13,13 +13,13 @@ type Entry struct {
 // UpdateStatusByTitle update entry status by title
 // if has "[wip]" prefix, entry status to private
 func (e *Entry) UpdateStatusByTitle() {
-	if _, ok := e.HasPrivateTitle(); ok {
+	if _, ok := e.TrimPrivateTitle(); ok {
 		e.Status = EntryStatusPrivate
 	}
 }
 
-// HasPrivateTitle returns contain private keyword in the title, and trimmed title
-func (e *Entry) HasPrivateTitle() (string, bool) {
+// TrimPrivateTitle returns contain private keyword in the title, and trimmed title
+func (e *Entry) TrimPrivateTitle() (string, bool) {
 	if len(e.Title) < 6 {
 		return e.Title, false
 	}
