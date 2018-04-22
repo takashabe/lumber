@@ -1,6 +1,8 @@
 package application
 
 import (
+	"database/sql"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -71,8 +73,18 @@ func (i *EntryInteractor) Post(e *EntryElement) (int, error) {
 		return 0, errors.Errorf("invalid entry status type: %d", e.Status)
 	}
 	entry := e.Entity()
+	if !i.duplicateTitle(entry) {
+		return 0, errors.Wrapf(config.ErrDuplicatedTitle, fmt.Sprintf("title: %s", e.Title))
+	}
+
 	entry.UpdateStatusByTitle()
 	return i.entryRepo.Save(entry)
+}
+
+func (i *EntryInteractor) duplicateTitle(entry *domain.Entry) bool {
+	title, _ := entry.TrimPrivateTitle()
+	_, err := i.entryRepo.GetByTitle(title)
+	return err != nil && errors.Cause(err) == sql.ErrNoRows
 }
 
 // Edit changes entry the title and content

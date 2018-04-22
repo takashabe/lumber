@@ -69,6 +69,7 @@ func TestNewEntryElement(t *testing.T) {
 }
 
 func TestGetEntry(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		input     int
 		expectID  int
@@ -96,6 +97,7 @@ func TestGetEntry(t *testing.T) {
 }
 
 func TestGetIDsEntry(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		fixture   string
 		expectIDs []int
@@ -120,6 +122,7 @@ func TestGetIDsEntry(t *testing.T) {
 }
 
 func TestGetTitlesEntry(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		fixture string
 		start   int
@@ -151,12 +154,14 @@ func TestGetTitlesEntry(t *testing.T) {
 }
 
 func TestPostEntry(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		inputFilePath string
 		expectErr     error
 	}{
 		{"testdata/go-pubsub_readme.md", nil},
 		{"testdata/minimum.md", nil},
+		{"testdata/minimum.md", config.ErrDuplicatedTitle},
 	}
 	for i, c := range cases {
 		data, err := ioutil.ReadFile(c.inputFilePath)
@@ -176,6 +181,7 @@ func TestPostEntry(t *testing.T) {
 }
 
 func TestPostWithPrivateTitle(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		inputFilePath string
 		expectEntry   *domain.Entry
@@ -191,7 +197,7 @@ func TestPostWithPrivateTitle(t *testing.T) {
 		{
 			"testdata/wip.md",
 			&domain.Entry{
-				Title:   "[wip] title",
+				Title:   "[wip] wip_title",
 				Content: "<p>content</p>",
 				Status:  1,
 			},
@@ -218,6 +224,7 @@ func TestPostWithPrivateTitle(t *testing.T) {
 }
 
 func TestEditEntry(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		inputID   int
 		inputData []byte
@@ -255,6 +262,7 @@ func TestEditEntry(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
+	helper.LoadFixture(t, "testdata/clean.sql")
 	cases := []struct {
 		input     int
 		expectErr error

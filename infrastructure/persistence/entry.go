@@ -35,7 +35,16 @@ func (r *EntryRepositoryImpl) mapToEntity(row *sql.Row) (*domain.Entry, error) {
 
 // Get return a entry record matched by 'id'
 func (r *EntryRepositoryImpl) Get(id int) (*domain.Entry, error) {
-	row, err := r.queryRow("select id, title, content,  status from entries where id=?", id)
+	row, err := r.queryRow("select id, title, content, status from entries where id=?", id)
+	if err != nil {
+		return nil, err
+	}
+	return r.mapToEntity(row)
+}
+
+// GetByTitle return a entry record matched by 'title'
+func (r *EntryRepositoryImpl) GetByTitle(title string) (*domain.Entry, error) {
+	row, err := r.queryRow("select id, title, content, status from entries where title=?", title)
 	if err != nil {
 		return nil, err
 	}
