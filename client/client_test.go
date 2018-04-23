@@ -29,6 +29,7 @@ func setupServer(t *testing.T) *httptest.Server {
 func TestCreateAndGetEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()
+	helper.InitializeTable()
 
 	cases := []struct {
 		input         string
@@ -37,7 +38,7 @@ func TestCreateAndGetEntry(t *testing.T) {
 	}{
 		{
 			"testdata/minimum.md",
-			"title",
+			"min_title",
 			"<p>content</p>",
 		},
 	}
@@ -78,13 +79,13 @@ func TestEditEntry(t *testing.T) {
 		{
 			1,
 			"testdata/minimum.md",
-			"title",
+			"min_title",
 			"<p>content</p>",
 		},
 		{
 			1,
 			"testdata/minimum2.md",
-			"title",
+			"min_title_2",
 			"<h2>content</h2>\n\n<ul>\n<li>list</li>\n<li>list2</li>\n</ul>",
 		},
 	}

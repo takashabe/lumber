@@ -1,3 +1,3 @@
-title
+min_title
 
 content

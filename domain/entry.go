@@ -13,8 +13,15 @@ type Entry struct {
 // UpdateStatusByTitle update entry status by title
 // if has "[wip]" prefix, entry status to private
 func (e *Entry) UpdateStatusByTitle() {
+	if _, ok := e.TrimPrivateTitle(); ok {
+		e.Status = EntryStatusPrivate
+	}
+}
+
+// TrimPrivateTitle returns contain private keyword in the title, and trimmed title
+func (e *Entry) TrimPrivateTitle() (string, bool) {
 	if len(e.Title) < 6 {
-		return
+		return e.Title, false
 	}
 
 	var wip = []string{
@@ -23,10 +30,11 @@ func (e *Entry) UpdateStatusByTitle() {
 	}
 	for _, w := range wip {
 		if strings.HasPrefix(e.Title, w) {
-			e.Status = EntryStatusPrivate
-			return
+			s := e.Title[len(w):]
+			return strings.TrimSpace(s), true
 		}
 	}
+	return e.Title, false
 }
 
 // EntryStatus represent status of the entries

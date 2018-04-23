@@ -46,6 +46,24 @@ func SetupTables() {
 	}
 }
 
+// InitializeTable delete all data each talbe
+func InitializeTable() {
+	db, err := newDatastore()
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	f, err := fixture.NewFixture(db, "mysql")
+	if err != nil {
+		panic(err)
+	}
+	err = f.Load("../_sql/schema.sql")
+	if err != nil {
+		panic(err)
+	}
+}
+
 // newDatastore returns sql.DB
 // Porting from datastore package
 func newDatastore() (*sql.DB, error) {
