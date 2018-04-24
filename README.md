@@ -1,16 +1,13 @@
 # lumber
 
-## Deploy image
+Lumber is the blog management system. Lumber has an API server to return blog content and CLI tool to manage blog content.
 
-* Ideal deploy flow
-    1. git push origin master
-        * CI at CircleCI
-        * docker build at CircleCI
-        * docker push to dockerhub
-    2. k8s deploy with dockerhub latest images by Spinnaker
+## Installation
 
-refs: http://tech.mercari.com/entry/2017/08/21/092743
+```
+go get -u github.com/takashabe/lumber
+```
 
-## Architecture reference:
+## Usage
 
-refs: https://speakerdeck.com/mercari/ja-golang-package-composition-for-web-application-the-case-of-mercari-kauru
+_TODO_
