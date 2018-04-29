@@ -33,6 +33,7 @@ type param struct {
 	addr  string
 	file  string
 	dir   string
+	id    int
 	token string
 }
 
@@ -84,8 +85,9 @@ func (c *CLI) parseArgs(args []string, p *param) error {
 	flags.SetOutput(c.ErrStream)
 
 	flags.StringVar(&p.addr, "addr", defaultAddr, "Lumber server address.")
-	flags.StringVar(&p.file, "file", "", "Post an entry file")
+	flags.StringVar(&p.file, "file", "", "Post or Edit an entry file")
 	flags.StringVar(&p.dir, "dir", "", "Post an entries in the directory")
+	flags.IntVar(&p.id, "id", 0, "Specific ID of an entry")
 	flags.StringVar(&p.token, "token", "", "Server token")
 
 	err := flags.Parse(args)
@@ -112,6 +114,11 @@ func (c *CLI) commands() []command {
 			"post-dir",
 			"post an entries in the directory",
 			c.doPostEntryWithDir,
+		},
+		{
+			"edit",
+			"edit the entry",
+			c.doEditEntry,
 		},
 	}
 }
@@ -154,6 +161,15 @@ func (c *CLI) postEntryRecursiveDir(ctx context.Context, p *param) error {
 			return err
 		}
 		ids = append(ids, id)
+	}
+	return nil
+}
+
+func (c *CLI) doEditEntry(ctx context.Context, p *param) error {
+	e := c.client.Entry(p.id)
+	err := e.Edit(ctx, p.file)
+	if err != nil {
+		return errors.Wrap(err, "failed to edit an entry")
 	}
 	return nil
 }
