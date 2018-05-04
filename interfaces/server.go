@@ -68,6 +68,9 @@ func Error(w http.ResponseWriter, code int, err error, msg string) {
 	printDebugf("%s", e.String())
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	Respond(w, code, e)
+
+	// TODO: delegate logging library
+	fmt.Fprintf(os.Stderr, "[ERROR] %#v", e)
 }
 
 // JSON is wrapped Respond when success response
