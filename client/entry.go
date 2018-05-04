@@ -38,7 +38,7 @@ func (e *Entry) Get(ctx context.Context) (*EntryContent, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-	err = verifyHTTPStatusCode(http.StatusOK, res)
+	err = verifyHTTPStatusCode(res, http.StatusOK)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (e *Entry) Edit(ctx context.Context, file string) error {
 		return err
 	}
 	defer res.Body.Close()
-	return verifyHTTPStatusCode(http.StatusOK, res)
+	return verifyHTTPStatusCode(res, http.StatusOK)
 }
 
 // Delete submit makrdown file as an entry
@@ -98,5 +98,5 @@ func (e *Entry) Delete(ctx context.Context) error {
 		return err
 	}
 	defer res.Body.Close()
-	return verifyHTTPStatusCode(http.StatusOK, res)
+	return verifyHTTPStatusCode(res, http.StatusOK)
 }

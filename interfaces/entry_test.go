@@ -121,6 +121,9 @@ func TestPostEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()
 
+	helper.LoadFixture(t, "testdata/entries.yml")
+	helper.LoadFixture(t, "testdata/tokens.yml")
+
 	type postPayload struct {
 		Data   []byte `json:"data"`
 		Status int    `json:"status"`
@@ -141,6 +144,14 @@ func TestPostEntry(t *testing.T) {
 		{
 			postPayload{
 				Data:   []byte("# title\n\n## content"),
+				Status: 1,
+			},
+			"foo",
+			http.StatusNoContent, // duplicate title
+		},
+		{
+			postPayload{
+				Data:   []byte("# title99\n\n## content"),
 				Status: 99,
 			},
 			"foo",
@@ -164,8 +175,6 @@ func TestPostEntry(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		helper.LoadFixture(t, "testdata/entries.yml")
-		helper.LoadFixture(t, "testdata/tokens.yml")
 		var buf bytes.Buffer
 		err := json.NewEncoder(&buf).Encode(c.input)
 		if err != nil {

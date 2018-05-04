@@ -2,11 +2,13 @@ package interfaces
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	"github.com/takashabe/lumber/application"
+	"github.com/takashabe/lumber/config"
 	"github.com/takashabe/lumber/domain"
 	"github.com/takashabe/lumber/domain/repository"
 )
@@ -96,6 +98,10 @@ func (h *EntryHandler) Post(w http.ResponseWriter, r *http.Request) {
 	element.Status = domain.EntryStatus(raw.Status)
 	id, err := h.entry.Post(element)
 	if err != nil {
+		if errors.Cause(err) == config.ErrDuplicatedTitle {
+			JSON(w, http.StatusNoContent, nil)
+			return
+		}
 		Error(w, http.StatusNotFound, err, "failed to create new entry")
 		return
 	}

@@ -66,6 +66,30 @@ func TestCreateAndGetEntry(t *testing.T) {
 	}
 }
 
+func TestCreateDuplicateEntry(t *testing.T) {
+	ts := setupServer(t)
+	defer ts.Close()
+	helper.InitializeTable()
+
+	cases := []struct {
+		input string
+	}{
+		{"testdata/minimum.md"},
+		{"testdata/minimum.md"},
+	}
+	for i, c := range cases {
+		ctx := context.Background()
+		client, err := New()
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+		_, err = client.CreateEntry(ctx, c.input)
+		if err != nil {
+			t.Fatalf("#%d: want non error, got %#v", i, err)
+		}
+	}
+}
+
 func TestEditEntry(t *testing.T) {
 	ts := setupServer(t)
 	defer ts.Close()
