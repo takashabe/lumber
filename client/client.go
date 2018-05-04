@@ -83,7 +83,7 @@ func (c *Client) CreateEntry(ctx context.Context, file string) (int, error) {
 	if err != nil {
 		// TODO: error handling
 		b, _ := ioutil.ReadAll(res.Body)
-		return 0, errors.Wrapf(err, "response: %s", b)
+		return 0, errors.Wrapf(err, "file: %s, response: %s", file, b)
 	}
 	if res.StatusCode == http.StatusNoContent {
 		return 0, nil
