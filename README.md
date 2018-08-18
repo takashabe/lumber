@@ -7,7 +7,11 @@ Lumber is the blog management system. Lumber has an API server to return blog co
 ## Installation
 
 ```
-go get -u github.com/takashabe/lumber
+## server
+go get -u github.com/takashabe/lumber/cmd/server
+
+## client
+go get -u github.com/takashabe/lumber/cmd/client
 ```
 
 ## CLI
